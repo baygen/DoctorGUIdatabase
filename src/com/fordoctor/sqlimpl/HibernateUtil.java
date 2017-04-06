@@ -7,6 +7,7 @@ package com.fordoctor.sqlimpl;
 
 import com.forDoctors.entity.Seanse;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -47,7 +48,7 @@ public class HibernateUtil
         Session ses = getSessionFactory().openSession();
         try{
             ses.beginTransaction();
-            ses.save(seanse);
+            ses.saveOrUpdate(seanse);
             ses.getTransaction().commit();
             ses.close();
         }catch(HibernateException e){
@@ -57,26 +58,29 @@ public class HibernateUtil
     }
     
 //    @Override
-    public int updateObj(Object obj) {
-        Session ses =getSessionFactory().openSession();
-        ses.createQuery("");
-        
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+//    public int updateObj(Object obj) {
+//        Session ses =getSessionFactory().openSession();
+//        ses.createQuery("");
+//        
+//        throw new UnsupportedOperationException("Not supported yet."); 
+//    }
 
 //    @Override
     public static List<?> getListBy_Date(String date) {
         
         Session ses =getSessionFactory().openSession();
 //        ses.createQuery("Seanse.findBysDate",date);
+        ses.beginTransaction();
         Query query = ses.getNamedQuery("Seanse.findBySDate");
         query.setString("sDate", date);
         List<Seanse> res=query.list();
         
+        ses.getTransaction().commit();
+        ses.flush();
             try{
                 ses.close();
-            }catch(HibernateException w){
-                System.out.println("com.fordoctor.sqlimpl.HibernateUtil.getListBy_Date()"+w.getMessage());
+            }catch(HibernateException he){
+                JOptionPane.showMessageDialog(null, he.getMessage());
             }
     
         return res;        
@@ -89,7 +93,17 @@ public class HibernateUtil
 
 //    @Override
     public List<?> getAllSeanse() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Session session=getSessionFactory().openSession();
+        session.beginTransaction();
+        Query query = session.getNamedQuery("Seanse.findAll");
+        List<Seanse> res = query.list();
+        session.getTransaction().commit();
+        try{
+            session.close();
+        }catch(HibernateException he){
+            JOptionPane.showMessageDialog(null, he.getMessage());
+        }
+        return res;
     }
 
 //    @Override
