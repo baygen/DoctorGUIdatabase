@@ -509,7 +509,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private String getTodayForTable(){
-        String today= getSeanseDay().getDayOfMonth()+"."+getSeanseDay().getMonthValue()+"."+getSeanseDay().getYear();
+        String today = getSeanseDay().getDayOfMonth()+"."+getSeanseDay().getMonthValue()+"."+getSeanseDay().getYear();
         today = getSeanseDay().toString();
         return today;
     }
@@ -552,6 +552,9 @@ public class MainFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             new MainFrame().setVisible(true);
         });
+
+    
+                
     }
     
     
