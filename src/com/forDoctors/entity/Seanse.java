@@ -87,11 +87,11 @@ public class Seanse implements Serializable {
         this.pacientPhone = pacientPhone;
     }
 
-    public String getSDate() {
+    public String getsDate() {
         return sDate;
     }
 
-    public void setSDate(String sDate) {
+    public void setsDate(String sDate) {
         this.sDate = sDate;
     }
 
@@ -117,7 +117,7 @@ public class Seanse implements Serializable {
 
     @Override
     public String toString() {
-        return "com.forDoctors.entity.Seanse[ id=" + id + " ]";
+        return id + " "+pacientName+" "+sDate+" "+ time+".";
     }
     
 }
