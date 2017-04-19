@@ -456,7 +456,7 @@ public class MainFrame extends javax.swing.JFrame {
                 for(int i = 0;i<dtm.getRowCount();i++){
                     String tableTime = (String)dtm.getValueAt(i, 1);
                     if(tableTime.equals(s.getTime())){
-                        dtm.setValueAt(s.getSDate(), i, 0);
+                        dtm.setValueAt(s.getsDate(), i, 0);
                         dtm.setValueAt(s.getPacientName(), i, 2);
                         dtm.setValueAt(s.getPacientPhone(), i, 3);
                     }
