@@ -53,7 +53,6 @@ public class HibernateUtil
             ses.close();
         }catch(HibernateException e){
             System.out.println(e.getMessage());
-            System.out.println("com.fordoctor.sqlimpl.HibernateUtil.addSeanse()");
         }
     }
     
@@ -65,7 +64,7 @@ public class HibernateUtil
 //        throw new UnsupportedOperationException("Not supported yet."); 
 //    }
 
-//    @Override
+
     public static List<?> getListBy_Date(String date) {
         
         Session ses =getSessionFactory().openSession();
@@ -86,12 +85,21 @@ public class HibernateUtil
         return res;        
     }
 
-//    @Override
     public List<?> getListByName(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Session ses =getSessionFactory().openSession();
+        ses.beginTransaction();
+        Query query = ses.getNamedQuery("Seanse.findByPacientName");
+        query.setString("pacientName", name);
+        List<Seanse> res = query.list();
+        ses.getTransaction().commit();
+        try{
+            ses.close();
+        }catch(HibernateException he){
+            
+        }
+        return res;
     }
 
-//    @Override
     public List<?> getAllSeanse() {
         Session session=getSessionFactory().openSession();
         session.beginTransaction();
@@ -106,8 +114,8 @@ public class HibernateUtil
         return res;
     }
 
-//    @Override
     public int remove(String date, String time) {
+        Session se = getSessionFactory().getCurrentSession();
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
