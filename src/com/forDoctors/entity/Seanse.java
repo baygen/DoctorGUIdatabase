@@ -6,6 +6,7 @@
 package com.forDoctors.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,13 +41,13 @@ public class Seanse implements Serializable {
     @Column(name = "ID")
     private Integer id;
     @Column(name = "Time")
-    private Character time;
+    private String time;
     @Column(name = "PacientName")
     private String pacientName;
     @Column(name = "PacientPhone")
     private String pacientPhone;
     @Column(name = "sDate")
-    private String sDate;
+    private Date sDate;
 
     public Seanse() {
     }
@@ -63,11 +64,11 @@ public class Seanse implements Serializable {
         this.id = id;
     }
 
-    public Character getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Character time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
@@ -87,11 +88,11 @@ public class Seanse implements Serializable {
         this.pacientPhone = pacientPhone;
     }
 
-    public String getsDate() {
+    public Date getsDate() {
         return sDate;
     }
 
-    public void setsDate(String sDate) {
+    public void setsDate(Date sDate) {
         this.sDate = sDate;
     }
 
