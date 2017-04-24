@@ -6,6 +6,7 @@
 package com.fordoctor.sqlimpl;
 
 import com.forDoctors.entity.Seanse;
+import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
 import org.hibernate.HibernateException;
@@ -13,6 +14,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 /**
  * Hibernate Utility class with a convenient method to get Session Factory
@@ -47,9 +49,9 @@ public class HibernateUtil
     public void addSeanse(Object seanse) {
         Session ses = getSessionFactory().openSession();
         try{
-            ses.beginTransaction();
-            ses.saveOrUpdate(seanse);
-            ses.getTransaction().commit();
+            Transaction tr = ses.beginTransaction();
+            ses.save(seanse);
+            tr.commit();
             ses.close();
         }catch(HibernateException e){
             System.out.println(e.getMessage());
@@ -65,13 +67,12 @@ public class HibernateUtil
 //    }
 
 
-    public static List<?> getListBy_Date(String date) {
+    public static List<?> getListBy_Date(Date date) {
         
         Session ses =getSessionFactory().openSession();
-//        ses.createQuery("Seanse.findBysDate",date);
         ses.beginTransaction();
         Query query = ses.getNamedQuery("Seanse.findBySDate");
-        query.setString("sDate", date);
+        query.setDate("sDate", date);
         List<Seanse> res=query.list();
         
         ses.getTransaction().commit();
@@ -86,8 +87,10 @@ public class HibernateUtil
     }
 
     public List<?> getListByName(String name) {
+        
         Session ses =getSessionFactory().openSession();
         ses.beginTransaction();
+        
         Query query = ses.getNamedQuery("Seanse.findByPacientName");
         query.setString("pacientName", name);
         List<Seanse> res = query.list();
@@ -114,8 +117,12 @@ public class HibernateUtil
         return res;
     }
 
-    public int remove(String date, String time) {
-        Session se = getSessionFactory().getCurrentSession();
+    public int remove(Seanse seanse) {
+        Session session = getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        session.delete(seanse);
+        session.getTransaction().commit();
+        session.close();
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
