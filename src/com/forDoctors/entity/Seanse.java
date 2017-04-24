@@ -31,7 +31,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Seanse.findByTime", query = "SELECT s FROM Seanse s WHERE s.time = :time")
     , @NamedQuery(name = "Seanse.findByPacientName", query = "SELECT s FROM Seanse s WHERE s.pacientName = :pacientName")
     , @NamedQuery(name = "Seanse.findByPacientPhone", query = "SELECT s FROM Seanse s WHERE s.pacientPhone = :pacientPhone")
-    , @NamedQuery(name = "Seanse.findBySDate", query = "SELECT s FROM Seanse s WHERE s.sDate = :sDate")})
+    , @NamedQuery(name = "Seanse.findBySDate", query = "SELECT s FROM Seanse s WHERE s.sDate = :sDate")
+    ,@NamedQuery(name = "Seanse.findBySDateAndTime", query = "SELECT s FROM Seanse s WHERE s.sDate = :sDate and s.time = :time")
+})
 public class Seanse implements Serializable {
 
     private static final long serialVersionUID = 1L;
