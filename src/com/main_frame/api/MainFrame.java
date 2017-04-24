@@ -2,10 +2,16 @@ package com.main_frame.api;
 
 import com.forDoctors.entity.Seanse;
 import com.fordoctor.sqlimpl.HibernateUtil;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,8 +24,8 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         runningClock();
-        setSeanseFromDatabaseToTable(getTodayForTable(), jTableToday);
-        setSeanseFromDatabaseToTable(getDayForNextTable(), jTableNextDay);
+//        setSeanseFromDatabaseToTable(getTodayForTable(), jTableToday);
+//        setSeanseFromDatabaseToTable(getDayForNextTable(), jTableNextDay);
     }
 
     @SuppressWarnings("unchecked")
@@ -96,7 +102,7 @@ public class MainFrame extends javax.swing.JFrame {
         panelTodayTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.white, java.awt.Color.lightGray));
 
         labelTodayDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        labelTodayDate.setText(getTodayForTable());
+        labelTodayDate.setText(getTodayForTableString());
 
         jTableToday.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jTableToday.setModel(new javax.swing.table.DefaultTableModel(
@@ -199,7 +205,7 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPaneTomorrow.setViewportView(jTableNextDay);
 
         labelNextDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        labelNextDate.setText(getDayForNextTable());
+        labelNextDate.setText(getDayForNextTable(getSeanseDay()));
 
         javax.swing.GroupLayout panelTomorrowTableLayout = new javax.swing.GroupLayout(panelTomorrowTable);
         panelTomorrowTable.setLayout(panelTomorrowTableLayout);
@@ -249,7 +255,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         tfPhone.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
-        tfDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        tfDate.setFont(new java.awt.Font("Tahoma", 0, 14));
+        tfDate.setText(getTodayForTableString());
 
         jButNewPacient.setText("Add seanse");
         jButNewPacient.addActionListener(new java.awt.event.ActionListener() {
@@ -441,12 +448,21 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void jButNewPacientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButNewPacientActionPerformed
-        // TODO add your handling code here:
+        
+       getSeanseFromGUI();
+//       HibernateUtil.
+    
     }//GEN-LAST:event_jButNewPacientActionPerformed
 
     private void setSeanseFromDatabaseToTable(String day, JTable table){
-        
-        List lis=HibernateUtil.getListBy_Date(day);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+                Date d=null;
+        try {
+            d = sdf.parse(day);
+        } catch (ParseException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List lis=HibernateUtil.getListBy_Date(d);
         
         if(!lis.isEmpty()){ 
             DefaultTableModel dtm= (DefaultTableModel)table.getModel();
@@ -492,34 +508,37 @@ public class MainFrame extends javax.swing.JFrame {
         thr.start();
     }
 
-    private LocalDate getSeanseDay() {
+    public static LocalDate getSeanseDay() {
         LocalDate day=LocalDate.now();
         DayOfWeek todayOfWeek=day.getDayOfWeek();
 //        String today=LocalDate.now().getDayOfMonth()+"."+LocalDate.now().getMonthValue()+"."+LocalDate.now().getYear();
             if(todayOfWeek.equals(DayOfWeek.TUESDAY)||todayOfWeek.equals(DayOfWeek.THURSDAY)||todayOfWeek.equals(DayOfWeek.SATURDAY)){
                 day = LocalDate.now();
             }else{
-                if(todayOfWeek.equals(DayOfWeek.MONDAY)){
-                   day = day.minusDays(2);
+                if(todayOfWeek.equals(DayOfWeek.SUNDAY)){
+                   day = day.plusDays(2);
                 }else{
-                day = day.minusDays(1);
+                day = day.plusDays(1);
                 }
             }        
         return day;
     }
     
-    private String getTodayForTable(){
-        String today = getSeanseDay().getDayOfMonth()+"."+getSeanseDay().getMonthValue()+"."+getSeanseDay().getYear();
+    private String getTodayForTableString(){
+        String today;
+//        = getSeanseDay().getDayOfMonth()+"."+getSeanseDay().getMonthValue()+"."+getSeanseDay().getYear();
         today = getSeanseDay().toString();
         return today;
     }
     
-    private String getDayForNextTable(){
+    public static String getDayForNextTable(LocalDate seanseDate){
         String next="";
             if(LocalDate.now().getDayOfWeek().SATURDAY.equals(LocalDate.now().getDayOfWeek())){
-                next = (getSeanseDay().getDayOfMonth()+3)+"."+getSeanseDay().getMonthValue()+"."+getSeanseDay().getYear();
+                next = seanseDate.plusDays(3).toString();
+//                getDayOfMonth()+3)+"."+seanseDate.getMonthValue()+"."+seanseDate.getYear();
             }else{
-                next = (getSeanseDay().getDayOfMonth()+2)+"."+getSeanseDay().getMonthValue()+"."+getSeanseDay().getYear();
+                next = seanseDate.plusDays(2).toString();
+//                +"."+seanseDate.getMonthValue()+"."+seanseDate.getYear();
             }
         return next;
     }
@@ -598,6 +617,23 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField tfPacFamily;
     private javax.swing.JTextField tfPhone;
     // End of variables declaration//GEN-END:variables
+
+    private void getSeanseFromGUI() {
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+           Date sDate=null;
+            try{
+                sDate = sdf.parse(tfDate.getText());
+            }catch(ParseException pe){
+                JOptionPane.showMessageDialog(null, "Wrong date format, must be dd-MM-yyyy");
+                tfDate.setText("dd-MM-yyyy");
+            }
+        Seanse seanse= new Seanse();
+        seanse.setPacientName(tfPacFamily.getText());
+        seanse.setPacientPhone(tfPhone.getText());
+        seanse.setTime((String)jComboTime.getSelectedItem());
+        seanse.setsDate(sDate);
+    }
 
 
 
