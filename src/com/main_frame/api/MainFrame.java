@@ -511,7 +511,7 @@ public class MainFrame extends javax.swing.JFrame {
     public static LocalDate getSeanseDay() {
         LocalDate day=LocalDate.now();
         DayOfWeek todayOfWeek=day.getDayOfWeek();
-//        String today=LocalDate.now().getDayOfMonth()+"."+LocalDate.now().getMonthValue()+"."+LocalDate.now().getYear();
+
             if(todayOfWeek.equals(DayOfWeek.TUESDAY)||todayOfWeek.equals(DayOfWeek.THURSDAY)||todayOfWeek.equals(DayOfWeek.SATURDAY)){
                 day = LocalDate.now();
             }else{
@@ -533,7 +533,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     public static String getDayForNextTable(LocalDate seanseDate){
         String next="";
-            if(LocalDate.now().getDayOfWeek().SATURDAY.equals(LocalDate.now().getDayOfWeek())){
+            if(DayOfWeek.SATURDAY.equals(LocalDate.now().getDayOfWeek())){
                 next = seanseDate.plusDays(3).toString();
 //                getDayOfMonth()+3)+"."+seanseDate.getMonthValue()+"."+seanseDate.getYear();
             }else{
@@ -618,7 +618,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField tfPhone;
     // End of variables declaration//GEN-END:variables
 
-    private void getSeanseFromGUI() {
+    private Seanse getSeanseFromGUI() {
         
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
            Date sDate=null;
@@ -633,6 +633,7 @@ public class MainFrame extends javax.swing.JFrame {
         seanse.setPacientPhone(tfPhone.getText());
         seanse.setTime((String)jComboTime.getSelectedItem());
         seanse.setsDate(sDate);
+        return seanse;
     }
 
 
