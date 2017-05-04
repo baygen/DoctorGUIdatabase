@@ -18,8 +18,8 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         runningClock();
-        setSeanseFromDatabaseToTable(getTodayForTable(), jTableToday);
-        setSeanseFromDatabaseToTable(getDayForNextTable(), jTableNextDay);
+//        setSeanseFromDatabaseToTable(getTodayForTable(), jTableToday);
+//        setSeanseFromDatabaseToTable(getDayForNextTable(), jTableNextDay);
     }
 
     @SuppressWarnings("unchecked")
@@ -89,11 +89,10 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        forTableMainPanel.setBackground(new java.awt.Color(240, 240, 240));
         forTableMainPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.white, java.awt.Color.lightGray));
 
         panelTodayTable.setBackground(new java.awt.Color(204, 204, 204));
-        panelTodayTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.white, java.awt.Color.lightGray));
+        panelTodayTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(0, java.awt.Color.white, java.awt.Color.lightGray));
 
         labelTodayDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         labelTodayDate.setText(getTodayForTable());
@@ -158,7 +157,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         panelTomorrowTable.setBackground(new java.awt.Color(204, 204, 204));
-        panelTomorrowTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.white, java.awt.Color.lightGray));
+        panelTomorrowTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(0, java.awt.Color.white, java.awt.Color.lightGray));
 
         jTableNextDay.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jTableNextDay.setModel(new javax.swing.table.DefaultTableModel(
@@ -219,6 +218,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPaneTomorrow, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -442,6 +443,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButNewPacientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButNewPacientActionPerformed
         // TODO add your handling code here:
+        
+        
+        
     }//GEN-LAST:event_jButNewPacientActionPerformed
 
     private void setSeanseFromDatabaseToTable(String day, JTable table){
@@ -549,8 +553,11 @@ public class MainFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new MainFrame().setVisible(true);
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new MainFrame().setVisible(true);
+            }
         });
 
     
