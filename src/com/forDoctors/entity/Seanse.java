@@ -6,6 +6,7 @@
 package com.forDoctors.entity;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -16,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -49,7 +52,8 @@ public class Seanse implements Serializable {
     @Column(name = "PacientPhone")
     private String pacientPhone;
     @Column(name = "sDate")
-    private Date sDate;
+    @Temporal(TemporalType.DATE)
+    private java.util.Date sDate;
 
     public Seanse() {
     }
@@ -95,6 +99,8 @@ public class Seanse implements Serializable {
     }
 
     public void setsDate(Date sDate) {
+//        SimpleDateFormat sdf= new SimpleDateFormat("dd-MM-yyyy");
+        
         this.sDate = sDate;
     }
 
