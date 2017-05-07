@@ -12,9 +12,11 @@ import javax.swing.JOptionPane;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 
 /**
  * Hibernate Utility class with a convenient method to get Session Factory
@@ -26,13 +28,16 @@ public class HibernateUtil
 //        implements WorkWithSQL_Doctor
 {
 
-    private static final SessionFactory sesFactory;
+    private static final SessionFactory sessionFactory;
     
     static {
         try {
             // Create the SessionFactory from standard (hibernate.cfg.xml) 
             // config file.
-            sesFactory = new AnnotationConfiguration().configure().buildSessionFactory();
+            Configuration configuration=new Configuration().configure("hibernate.cfg.xml");
+            ServiceRegistry registry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+            
+            sessionFactory = configuration.buildSessionFactory(registry);
         } catch (HibernateException ex) {
             // Log the exception. 
             System.err.println("Initial SessionFactory creation failed." + ex);
@@ -41,7 +46,7 @@ public class HibernateUtil
     }
     
     public static SessionFactory getSessionFactory() {
-        return sesFactory;
+        return sessionFactory;
     }
 
     
@@ -71,8 +76,9 @@ public class HibernateUtil
         
         Session ses =getSessionFactory().openSession();
         ses.beginTransaction();
-        Query query = ses.getNamedQuery("Seanse.findBySDate");
-        query.setDate("sDate", date);
+        Query query = ses.createQuery("SELECT s FROM Seanse s WHERE s.seanseDate = :seanseDate");
+//        getNamedQuery("com.forDoctors.entity.Seanse.findBySeanseDate");
+        query.setDate("seanseDate", date);
         List<Seanse> res=query.list();
         
         ses.getTransaction().commit();
@@ -91,8 +97,8 @@ public class HibernateUtil
         Session ses =getSessionFactory().openSession();
         ses.beginTransaction();
         
-        Query query = ses.getNamedQuery("Seanse.findByPacientName");
-        query.setString("pacientName", name);
+        Query query = ses.getNamedQuery("Seanse.findByPacienName");
+        query.setString("pacienName", name);
         List<Seanse> res = query.list();
         ses.getTransaction().commit();
         try{
@@ -106,7 +112,9 @@ public class HibernateUtil
     public List<?> getAllSeanse() {
         Session session=getSessionFactory().openSession();
         session.beginTransaction();
-        Query query = session.getNamedQuery("Seanse.findAll");
+        Query query;
+        query = session.createSQLQuery("SELECT * FROM seanse");
+//        getNamedQuery("Seanse.findAll");
         List<Seanse> res = query.list();
         session.getTransaction().commit();
         try{
@@ -123,7 +131,8 @@ public class HibernateUtil
         session.delete(seanse);
         session.getTransaction().commit();
         session.close();
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return seanse.getId();
     }
 
 

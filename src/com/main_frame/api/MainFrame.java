@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,11 +23,15 @@ import javax.swing.table.DefaultTableModel;
  */
 public class MainFrame extends javax.swing.JFrame {
 
+    private HibernateUtil hibUtil;
+    private Seanse seanse;
+
     public MainFrame() {
+        hibUtil = new HibernateUtil();
         initComponents();
         runningClock();
-//        setSeanseFromDatabaseToTable(getTodayForTable(), jTableToday);
-//        setSeanseFromDatabaseToTable(getDayForNextTable(), jTableNextDay);
+        setSeanseFromDatabaseToTable(labelTodayDate.getText(), jTableToday);
+        setSeanseFromDatabaseToTable(labelNextDate.getText(), jTableNextDay);
     }
 
     @SuppressWarnings("unchecked")
@@ -51,9 +57,10 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         tfPhone = new javax.swing.JTextField();
-        tfDate = new javax.swing.JTextField();
         jButNewPacient = new javax.swing.JButton();
         jComboTime = new javax.swing.JComboBox<>();
+        labResult = new javax.swing.JLabel();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jPanel1 = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
@@ -83,7 +90,7 @@ public class MainFrame extends javax.swing.JFrame {
         panelUpLayout.setHorizontalGroup(
             panelUpLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelUpLayout.createSequentialGroup()
-                .addContainerGap(878, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(labelClock, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -95,14 +102,13 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        forTableMainPanel.setBackground(new java.awt.Color(240, 240, 240));
         forTableMainPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.white, java.awt.Color.lightGray));
 
         panelTodayTable.setBackground(new java.awt.Color(204, 204, 204));
         panelTodayTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.white, java.awt.Color.lightGray));
 
         labelTodayDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        labelTodayDate.setText(getTodayForTableString());
+        labelTodayDate.setText(getFormattedDate(getStartSeanseDay()));
 
         jTableToday.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jTableToday.setModel(new javax.swing.table.DefaultTableModel(
@@ -205,7 +211,7 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPaneTomorrow.setViewportView(jTableNextDay);
 
         labelNextDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        labelNextDate.setText(getDayForNextTable(getSeanseDay()));
+        labelNextDate.setText(getFormattedDate(getNextTableDate(getStartSeanseDay())));
 
         javax.swing.GroupLayout panelTomorrowTableLayout = new javax.swing.GroupLayout(panelTomorrowTable);
         panelTomorrowTable.setLayout(panelTomorrowTableLayout);
@@ -230,11 +236,11 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 411, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 376, Short.MAX_VALUE)
         );
 
         jPanelNewSeanse.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.white, java.awt.Color.lightGray));
@@ -242,7 +248,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Pacient Family:");
 
-        tfPacFamily.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        tfPacFamily.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Pacient phone:");
@@ -255,9 +261,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         tfPhone.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
-        tfDate.setFont(new java.awt.Font("Tahoma", 0, 14));
-        tfDate.setText(getTodayForTableString());
-
         jButNewPacient.setText("Add seanse");
         jButNewPacient.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -267,6 +270,18 @@ public class MainFrame extends javax.swing.JFrame {
 
         jComboTime.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "10:00", "10:40", "11:20", "12:00", "12:40","13:20","14:40","15:20","16:00","16:40","17:20" }));
 
+        labResult.setText("jLabel5");
+
+        //labResult.setText(jDateChooser1.getDateFormatString());
+        jDateChooser1.setDateFormatString("dd-MM-yyyy");
+        jDateChooser1.setDateFormatString("dd MM yyyy");
+        jDateChooser1.setDebugGraphicsOptions(javax.swing.DebugGraphics.BUFFERED_OPTION);
+        jDateChooser1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jDateChooser1PropertyChange(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelNewSeanseLayout = new javax.swing.GroupLayout(jPanelNewSeanse);
         jPanelNewSeanse.setLayout(jPanelNewSeanseLayout);
         jPanelNewSeanseLayout.setHorizontalGroup(
@@ -274,16 +289,22 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tfPacFamily)
-                    .addComponent(tfPhone)
-                    .addComponent(tfDate)
-                    .addComponent(jComboTime, 0, 130, Short.MAX_VALUE))
+                    .addComponent(labResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
+                        .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
+                                .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(tfPacFamily)
+                                    .addComponent(tfPhone)
+                                    .addComponent(jComboTime, 0, 130, Short.MAX_VALUE))
+                                .addGap(22, 22, 22))
+                            .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))))
                 .addGap(18, 18, 18)
                 .addComponent(jButNewPacient)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -296,19 +317,21 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jButNewPacient)
                     .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tfPacFamily, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(tfPacFamily, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tfPhone, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tfDate, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jComboTime, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(labResult, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -325,7 +348,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelTodayTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelTomorrowTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(208, Short.MAX_VALUE))
         );
         forTableMainPanelLayout.setVerticalGroup(
             forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -334,7 +357,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelTodayTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanelNewSeanse, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelTomorrowTable, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -449,20 +472,40 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jButNewPacientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButNewPacientActionPerformed
         
-       getSeanseFromGUI();
+       Thread thread=new Thread("save pacient to DB"){
+            
+            @Override
+            public void run(){
+                try{
+                    if(getSeanseFromGUI()!=null){
+                        hibUtil.addSeanse((Seanse)getSeanseFromGUI());
+                        JOptionPane.showMessageDialog(null, "Seanse is created");
+                    }
+                }catch(NullPointerException e){
+                    JOptionPane.showMessageDialog(null, "seanse =null");
+                }
+            }
+       };
+       thread.start();
 //       HibernateUtil.
     
     }//GEN-LAST:event_jButNewPacientActionPerformed
 
+    private void jDateChooser1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDateChooser1PropertyChange
+//        try{
+//        labResult.setText(String.valueOf(jDateChooser1.getDateFormatString()));
+//        }catch(NullPointerException e){}
+    }//GEN-LAST:event_jDateChooser1PropertyChange
+
     private void setSeanseFromDatabaseToTable(String day, JTable table){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
-                Date d=null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                Date days=null;
         try {
-            d = sdf.parse(day);
+            days = sdf.parse(day);
         } catch (ParseException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        List lis=HibernateUtil.getListBy_Date(d);
+        List lis=HibernateUtil.getListBy_Date(days);
         
         if(!lis.isEmpty()){ 
             DefaultTableModel dtm= (DefaultTableModel)table.getModel();
@@ -471,9 +514,9 @@ public class MainFrame extends javax.swing.JFrame {
                 Seanse s = (Seanse)ob;
                 for(int i = 0;i<dtm.getRowCount();i++){
                     String tableTime = (String)dtm.getValueAt(i, 1);
-                    if(tableTime.equals(s.getTime())){
-                        dtm.setValueAt(s.getsDate(), i, 0);
-                        dtm.setValueAt(s.getPacientName(), i, 2);
+                    if(tableTime.equals(s.getSeanseTime())){
+                        dtm.setValueAt(s.getSeanseDate(), i, 0);
+                        dtm.setValueAt(s.getPacienName(), i, 2);
                         dtm.setValueAt(s.getPacientPhone(), i, 3);
                     }
                 }
@@ -508,36 +551,37 @@ public class MainFrame extends javax.swing.JFrame {
         thr.start();
     }
 
-    public static LocalDate getSeanseDay() {
-        LocalDate day=LocalDate.now();
-        DayOfWeek todayOfWeek=day.getDayOfWeek();
+    public static LocalDate getStartSeanseDay() {
+        LocalDate day;
+        DayOfWeek todayOfWeek=LocalDate.now().getDayOfWeek();
 
             if(todayOfWeek.equals(DayOfWeek.TUESDAY)||todayOfWeek.equals(DayOfWeek.THURSDAY)||todayOfWeek.equals(DayOfWeek.SATURDAY)){
                 day = LocalDate.now();
             }else{
                 if(todayOfWeek.equals(DayOfWeek.SUNDAY)){
-                   day = day.plusDays(2);
+                   day = LocalDate.now().plusDays(2);
                 }else{
-                day = day.plusDays(1);
+                day = LocalDate.now().plusDays(1);
                 }
             }        
         return day;
     }
     
-    private String getTodayForTableString(){
-        String today;
-//        = getSeanseDay().getDayOfMonth()+"."+getSeanseDay().getMonthValue()+"."+getSeanseDay().getYear();
-        today = getSeanseDay().toString();
-        return today;
+    private String getFormattedDate(LocalDate date){
+        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd.MM.yyyy");
+////        sdf.parseObject(
+//                date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT));
+////        )format(date);
+        return date.format(dtf);
     }
     
-    public static String getDayForNextTable(LocalDate seanseDate){
-        String next="";
+    public static LocalDate getNextTableDate(LocalDate seanseDate){
+        LocalDate next;
             if(DayOfWeek.SATURDAY.equals(LocalDate.now().getDayOfWeek())){
-                next = seanseDate.plusDays(3).toString();
+                next = seanseDate.plusDays(3);
 //                getDayOfMonth()+3)+"."+seanseDate.getMonthValue()+"."+seanseDate.getYear();
             }else{
-                next = seanseDate.plusDays(2).toString();
+                next = seanseDate.plusDays(2);
 //                +"."+seanseDate.getMonthValue()+"."+seanseDate.getYear();
             }
         return next;
@@ -591,6 +635,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu helpMenu;
     private javax.swing.JButton jButNewPacient;
     private javax.swing.JComboBox<String> jComboTime;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -602,6 +647,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPaneTomorrow;
     private javax.swing.JTable jTableNextDay;
     private javax.swing.JTable jTableToday;
+    private javax.swing.JLabel labResult;
     private javax.swing.JLabel labelClock;
     private javax.swing.JLabel labelNextDate;
     private javax.swing.JLabel labelTodayDate;
@@ -613,26 +659,47 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem pasteMenuItem;
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
-    private javax.swing.JTextField tfDate;
     private javax.swing.JTextField tfPacFamily;
     private javax.swing.JTextField tfPhone;
     // End of variables declaration//GEN-END:variables
 
     private Seanse getSeanseFromGUI() {
         
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-           Date sDate=null;
+        int id;
+//        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+//           Date sDate=null;
+//           Seanse seanse= null;
+
+//            try{
+//                sDate = sdf.parse(jDateChooser1.getDate().toString());
+//                            labResult.setText(jDateChooser1.getDate().toString());
+//
+//            }catch(ParseException pe){
+//                JOptionPane.showMessageDialog(null, "date exeption");
+////                tfDate.setText(sdf.format(LocalDate.now()));
+//            }
             try{
-                sDate = sdf.parse(tfDate.getText());
-            }catch(ParseException pe){
-                JOptionPane.showMessageDialog(null, "Wrong date format, must be dd-MM-yyyy");
-                tfDate.setText("dd-MM-yyyy");
+            if(!tfPacFamily.getText().trim().equals("")&&!tfPhone.getText().trim().equals("")&&jDateChooser1.getDate()!=null){
+                if(!hibUtil.getAllSeanse().isEmpty()){
+                 id=hibUtil.getAllSeanse().size()+1;
+                }else{
+                    id=1;
+                }
+                seanse= new Seanse(id, jDateChooser1.getDate(), (String)jComboTime.getSelectedItem(), tfPacFamily.getText());
+                seanse.setPacientPhone(tfPhone.getText());
+            }else{
+                
+                JOptionPane.showMessageDialog(null, "Field can't be empty");
             }
-        Seanse seanse= new Seanse();
-        seanse.setPacientName(tfPacFamily.getText());
-        seanse.setPacientPhone(tfPhone.getText());
-        seanse.setTime((String)jComboTime.getSelectedItem());
-        seanse.setsDate(sDate);
+            }catch(NullPointerException n){
+                
+            }
+            catch(Exception e){
+                JOptionPane.showMessageDialog(null, e.getMessage());
+
+            }
+      
+                   
         return seanse;
     }
 

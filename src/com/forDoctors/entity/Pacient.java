@@ -2,6 +2,7 @@
 package com.forDoctors.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -40,10 +42,22 @@ public class Pacient implements Serializable {
     private String firstName;
     @Column(name = "secondNmae", length = 255)
     private String secondNmae;
+    
+    @Column(name="seanses")
+    @OneToMany(mappedBy = "pacient1")
+    private Set<Seanse> seanses;
 
     public Pacient() {
     }
 
+    public void setSeanses(Set<Seanse> seansesSet){
+        this.seanses=seansesSet;
+    }
+    
+    public Set<Seanse> getSeanses(){
+        return seanses;                
+    }
+    
     public Pacient(Integer id) {
         this.id = id;
     }

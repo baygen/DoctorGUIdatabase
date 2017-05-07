@@ -6,13 +6,10 @@
 package com.forDoctors.entity;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -25,41 +22,48 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Buy
  */
-@Entity
+@Entity(name="Seanse")
 @Table(name = "seanse")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Seanse.findAll", query = "SELECT s FROM Seanse s")
     , @NamedQuery(name = "Seanse.findById", query = "SELECT s FROM Seanse s WHERE s.id = :id")
-    , @NamedQuery(name = "Seanse.findByTime", query = "SELECT s FROM Seanse s WHERE s.time = :time")
-    , @NamedQuery(name = "Seanse.findByPacientName", query = "SELECT s FROM Seanse s WHERE s.pacientName = :pacientName")
-    , @NamedQuery(name = "Seanse.findByPacientPhone", query = "SELECT s FROM Seanse s WHERE s.pacientPhone = :pacientPhone")
-    , @NamedQuery(name = "Seanse.findBySDate", query = "SELECT s FROM Seanse s WHERE s.sDate = :sDate")
-    ,@NamedQuery(name = "Seanse.findBySDateAndTime", query = "SELECT s FROM Seanse s WHERE s.sDate = :sDate and s.time = :time")
-})
+    , @NamedQuery(name = "Seanse.findBySeanseDate", query = "SELECT s FROM Seanse s WHERE s.seanseDate = :seanseDate")
+    , @NamedQuery(name = "Seanse.findBySeanseTime", query = "SELECT s FROM Seanse s WHERE s.seanseTime = :seanseTime")
+    , @NamedQuery(name = "Seanse.findByPacienName", query = "SELECT s FROM Seanse s WHERE s.pacienName = :pacienName")
+    , @NamedQuery(name = "Seanse.findByPacientPhone", query = "SELECT s FROM Seanse s WHERE s.pacientPhone = :pacientPhone")})
 public class Seanse implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO) 
     @Basic(optional = false)
-    @Column(name = "ID")
+    @Column(name = "id")
     private Integer id;
-    @Column(name = "Time")
-    private String time;
-    @Column(name = "PacientName")
-    private String pacientName;
-    @Column(name = "PacientPhone")
-    private String pacientPhone;
-    @Column(name = "sDate")
+    @Basic(optional = false)
+    @Column(name = "seanse_date")
     @Temporal(TemporalType.DATE)
-    private java.util.Date sDate;
+    private Date seanseDate;
+    @Basic(optional = false)
+    @Column(name = "seanse_time")
+    private String seanseTime;
+    @Basic(optional = false)
+    @Column(name = "pacien_name")
+    private String pacienName;
+    @Column(name = "pacient_phone")
+    private String pacientPhone;
 
     public Seanse() {
     }
 
     public Seanse(Integer id) {
         this.id = id;
+    }
+
+    public Seanse(Integer id, Date seanseDate, String seanseTime, String pacienName) {
+        this.id = id;
+        this.seanseDate = seanseDate;
+        this.seanseTime = seanseTime;
+        this.pacienName = pacienName;
     }
 
     public Integer getId() {
@@ -70,20 +74,28 @@ public class Seanse implements Serializable {
         this.id = id;
     }
 
-    public String getTime() {
-        return time;
+    public Date getSeanseDate() {
+        return seanseDate;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setSeanseDate(Date seanseDate) {
+        this.seanseDate = seanseDate;
     }
 
-    public String getPacientName() {
-        return pacientName;
+    public String getSeanseTime() {
+        return seanseTime;
     }
 
-    public void setPacientName(String pacientName) {
-        this.pacientName = pacientName;
+    public void setSeanseTime(String seanseTime) {
+        this.seanseTime = seanseTime;
+    }
+
+    public String getPacienName() {
+        return pacienName;
+    }
+
+    public void setPacienName(String pacienName) {
+        this.pacienName = pacienName;
     }
 
     public String getPacientPhone() {
@@ -92,16 +104,6 @@ public class Seanse implements Serializable {
 
     public void setPacientPhone(String pacientPhone) {
         this.pacientPhone = pacientPhone;
-    }
-
-    public Date getsDate() {
-        return sDate;
-    }
-
-    public void setsDate(Date sDate) {
-//        SimpleDateFormat sdf= new SimpleDateFormat("dd-MM-yyyy");
-        
-        this.sDate = sDate;
     }
 
     @Override
@@ -126,7 +128,7 @@ public class Seanse implements Serializable {
 
     @Override
     public String toString() {
-        return id + " "+pacientName+" "+sDate+" "+ time+".";
+        return "com.forDoctors.entity.Seanse[ id=" + id + " ]";
     }
     
 }
