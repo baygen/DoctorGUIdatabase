@@ -61,13 +61,16 @@ public class HibernateUtil
         
     }
     
-//    @Override
-//    public int updateObj(Object obj) {
-//        Session ses =getSessionFactory().openSession();
-//        ses.createQuery("");
-//        
-//        throw new UnsupportedOperationException("Not supported yet."); 
-//    }
+    
+    public int updateObj(Object seanse) {
+        Session ses =getSessionFactory().openSession();
+        Transaction tr= ses.beginTransaction();
+        Seanses seans = (Seanses)seanse; 
+        ses.update(seans);
+        tr.commit();
+        ses.close();
+        return seans.getSeansesID();
+    }
 
 
     public static List<?> getListBy_Date(String date) {
@@ -76,12 +79,10 @@ public class HibernateUtil
         ses.beginTransaction();
         String getByDate="SELECT s FROM Seanses s where s.seansesTime like '"+date+"%'";
         Query query = ses.createQuery(getByDate);
-//        getNamedQuery("com.forDoctors.entity.Seanse.findBySeanseDate");
-//        query.setTimestamp("seansesTime", date);
         List<Seanses> res=query.list();
         
         ses.getTransaction().commit();
-        ses.flush();
+//        ses.flush();
             try{
                 ses.close();
             }catch(HibernateException he){
