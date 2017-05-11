@@ -5,7 +5,7 @@
  */
 package com.fordoctor.sqlimpl;
 
-import com.forDoctors.entity.Seanse;
+import com.forDoctors.entity.Seanses;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -51,16 +51,14 @@ public class HibernateUtil
 
     
 //    @Override
-    public void addSeanse(Object seanse) {
+    public void addSeanse (Object seanse) throws HibernateException{
         Session ses = getSessionFactory().openSession();
-        try{
+        
             Transaction tr = ses.beginTransaction();
             ses.save(seanse);
             tr.commit();
             ses.close();
-        }catch(HibernateException e){
-            System.out.println(e.getMessage());
-        }
+        
     }
     
 //    @Override
@@ -72,14 +70,15 @@ public class HibernateUtil
 //    }
 
 
-    public static List<?> getListBy_Date(Date date) {
+    public static List<?> getListBy_Date(String date) {
         
         Session ses =getSessionFactory().openSession();
         ses.beginTransaction();
-        Query query = ses.createQuery("SELECT s FROM Seanse s WHERE s.seanseDate = :seanseDate");
+        String getByDate="SELECT s FROM Seanses s where s.seansesTime like '"+date+"%'";
+        Query query = ses.createQuery(getByDate);
 //        getNamedQuery("com.forDoctors.entity.Seanse.findBySeanseDate");
-        query.setDate("seanseDate", date);
-        List<Seanse> res=query.list();
+//        query.setTimestamp("seansesTime", date);
+        List<Seanses> res=query.list();
         
         ses.getTransaction().commit();
         ses.flush();
@@ -97,14 +96,13 @@ public class HibernateUtil
         Session ses =getSessionFactory().openSession();
         ses.beginTransaction();
         
-        Query query = ses.getNamedQuery("Seanse.findByPacienName");
-        query.setString("pacienName", name);
-        List<Seanse> res = query.list();
+        Query query = ses.getNamedQuery("Seanses.findByPacientName");
+        query.setString("pacientName", name);
+        List<Seanses> res = query.list();
         ses.getTransaction().commit();
         try{
             ses.close();
         }catch(HibernateException he){
-            
         }
         return res;
     }
@@ -113,9 +111,9 @@ public class HibernateUtil
         Session session=getSessionFactory().openSession();
         session.beginTransaction();
         Query query;
-        query = session.createSQLQuery("SELECT * FROM seanse");
+        query = session.createSQLQuery("SELECT * FROM Seanses");
 //        getNamedQuery("Seanse.findAll");
-        List<Seanse> res = query.list();
+        List<Seanses> res = query.list();
         session.getTransaction().commit();
         try{
             session.close();
@@ -125,14 +123,15 @@ public class HibernateUtil
         return res;
     }
 
-    public int remove(Seanse seanse) {
+    public int remove(Seanses seanse) {
         Session session = getSessionFactory().getCurrentSession();
         session.beginTransaction();
+        int id = seanse.getSeansesID();
         session.delete(seanse);
         session.getTransaction().commit();
         session.close();
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        return seanse.getId();
+        return id;
     }
 
 

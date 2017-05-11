@@ -45,16 +45,16 @@ public class Pacient implements Serializable {
     
     @Column(name="seanses")
     @OneToMany(mappedBy = "pacient1")
-    private Set<Seanse> seanses;
+    private Set<Seanses> seanses;
 
     public Pacient() {
     }
 
-    public void setSeanses(Set<Seanse> seansesSet){
+    public void setSeanses(Set<Seanses> seansesSet){
         this.seanses=seansesSet;
     }
     
-    public Set<Seanse> getSeanses(){
+    public Set<Seanses> getSeanses(){
         return seanses;                
     }
     

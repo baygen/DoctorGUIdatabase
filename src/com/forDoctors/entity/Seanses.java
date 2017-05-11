@@ -6,6 +6,8 @@
 package com.forDoctors.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -41,7 +43,7 @@ public class Seanses implements Serializable {
     @Basic(optional = false)
     @Column(name = "seansesTime")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date seansesTime;
+    private Calendar seansesTime;
     @Basic(optional = false)
     @Column(name = "pacientName")
     private String pacientName;
@@ -51,11 +53,11 @@ public class Seanses implements Serializable {
     public Seanses() {
     }
 
-    public Seanses(Date seansesTime) {
+    public Seanses(Calendar seansesTime) {
         this.seansesTime = seansesTime;
     }
 
-    public Seanses(Date seansesTime, int seansesID, String pacientName) {
+    public Seanses(Calendar seansesTime, int seansesID, String pacientName) {
         this.seansesTime = seansesTime;
         this.seansesID = seansesID;
         this.pacientName = pacientName;
@@ -69,11 +71,11 @@ public class Seanses implements Serializable {
         this.seansesID = seansesID;
     }
 
-    public Date getSeansesTime() {
+    public Calendar getSeansesTime() {
         return seansesTime;
     }
 
-    public void setSeansesTime(Date seansesTime) {
+    public void setSeansesTime(Calendar seansesTime) {
         this.seansesTime = seansesTime;
     }
 

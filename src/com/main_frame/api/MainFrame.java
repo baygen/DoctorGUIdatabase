@@ -1,18 +1,17 @@
 package com.main_frame.api;
 
-import com.forDoctors.entity.Seanse;
+import com.forDoctors.entity.Seanses;
 import com.fordoctor.sqlimpl.HibernateUtil;
+import java.awt.HeadlessException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -23,15 +22,15 @@ import javax.swing.table.DefaultTableModel;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private HibernateUtil hibUtil;
-    private Seanse seanse;
+    private final HibernateUtil hibUtil;
+    private Seanses seanse;
 
     public MainFrame() {
         hibUtil = new HibernateUtil();
         initComponents();
         runningClock();
-        setSeanseFromDatabaseToTable(labelTodayDate.getText(), jTableToday);
-        setSeanseFromDatabaseToTable(labelNextDate.getText(), jTableNextDay);
+        setSeanseFromDatabaseToTable(getStartSeanseDay(), jTableToday);
+        setSeanseFromDatabaseToTable(getNextTableDate(), jTableNextDay);
     }
 
     @SuppressWarnings("unchecked")
@@ -211,7 +210,7 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPaneTomorrow.setViewportView(jTableNextDay);
 
         labelNextDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        labelNextDate.setText(getFormattedDate(getNextTableDate(getStartSeanseDay())));
+        labelNextDate.setText(getFormattedDate(getNextTableDate()));
 
         javax.swing.GroupLayout panelTomorrowTableLayout = new javax.swing.GroupLayout(panelTomorrowTable);
         panelTomorrowTable.setLayout(panelTomorrowTableLayout);
@@ -274,13 +273,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         //labResult.setText(jDateChooser1.getDateFormatString());
         jDateChooser1.setDateFormatString("dd-MM-yyyy");
-        jDateChooser1.setDateFormatString("dd MM yyyy");
         jDateChooser1.setDebugGraphicsOptions(javax.swing.DebugGraphics.BUFFERED_OPTION);
-        jDateChooser1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jDateChooser1PropertyChange(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanelNewSeanseLayout = new javax.swing.GroupLayout(jPanelNewSeanse);
         jPanelNewSeanse.setLayout(jPanelNewSeanseLayout);
@@ -471,57 +464,72 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void jButNewPacientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButNewPacientActionPerformed
+                        
+        SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
         
-       Thread thread=new Thread("save pacient to DB"){
-            
-            @Override
-            public void run(){
-                try{
-                    if(getSeanseFromGUI()!=null){
-                        hibUtil.addSeanse((Seanse)getSeanseFromGUI());
-                        JOptionPane.showMessageDialog(null, "Seanse is created");
-                    }
-                }catch(NullPointerException e){
-                    JOptionPane.showMessageDialog(null, "seanse =null");
-                }
+        String date_time= sdfDate.format(jDateChooser1.getDate())+" "+jComboTime.getSelectedItem().toString();
+        
+        Date date =null;          
+            try {
+                date= sdfDateTime.parse(date_time);
+            }catch (ParseException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
             }
-       };
-       thread.start();
+//        dateTime.toLocalDateTime().
+        Calendar cal= sdfDate.getCalendar();
+        
+        JOptionPane.showMessageDialog(null, date_time+"date:"+date);
+        
+        
+//       Thread thread = new Thread("save pacient to DB"){
+//            
+//            @Override
+//            public void run(){
+//                try{
+//                    if(getSeanseFromGUI()!=null){
+//                        hibUtil.addSeanse((Seanse)getSeanseFromGUI());
+//                        JOptionPane.showMessageDialog(null, "Seanse is created");
+//                        
+////                        if(getSeanseFromGUI().getSeanseDate().compareTo()){
+//                            
+////                        }
+//                    }
+//                    
+//                }catch(NullPointerException e){
+//                    JOptionPane.showMessageDialog(null, "seanse =null");
+//                }
+//            }
+//       };
+//       thread.start();
+      
 //       HibernateUtil.
     
     }//GEN-LAST:event_jButNewPacientActionPerformed
 
-    private void jDateChooser1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDateChooser1PropertyChange
-//        try{
-//        labResult.setText(String.valueOf(jDateChooser1.getDateFormatString()));
-//        }catch(NullPointerException e){}
-    }//GEN-LAST:event_jDateChooser1PropertyChange
-
-    private void setSeanseFromDatabaseToTable(String day, JTable table){
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-                Date days=null;
-        try {
-            days = sdf.parse(day);
-        } catch (ParseException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        List lis=HibernateUtil.getListBy_Date(days);
+    private void setSeanseFromDatabaseToTable(LocalDate date, JTable table){
         
-        if(!lis.isEmpty()){ 
-            DefaultTableModel dtm= (DefaultTableModel)table.getModel();
-//      Set data to JTable
-            lis.forEach((ob) -> {
-                Seanse s = (Seanse)ob;
-                for(int i = 0;i<dtm.getRowCount();i++){
-                    String tableTime = (String)dtm.getValueAt(i, 1);
-                    if(tableTime.equals(s.getSeanseTime())){
-                        dtm.setValueAt(s.getSeanseDate(), i, 0);
-                        dtm.setValueAt(s.getPacienName(), i, 2);
-                        dtm.setValueAt(s.getPacientPhone(), i, 3);
+        String day =date.format(DateTimeFormatter.ISO_DATE);
+                
+        List lis=HibernateUtil.getListBy_Date(day);
+            
+            if(!lis.isEmpty()){ 
+                DefaultTableModel dtm = (DefaultTableModel)table.getModel();
+//              Set data to JTable
+                lis.forEach((ob) -> {
+                    Seanses s = (Seanses)ob;
+                    String sqlTime=s.getSeansesTime().get(Calendar.HOUR_OF_DAY)+":"+s.getSeansesTime().get(Calendar.MINUTE);
+                
+                    for(int i = 0;i<dtm.getRowCount();i++){
+                        String tableTime = (String)dtm.getValueAt(i, 1);
+                
+                            if(tableTime.equals(sqlTime)){
+                                dtm.setValueAt(s.getPacientName(), i, 2);
+                                dtm.setValueAt(s.getPacientPhone(), i, 3);
+                            }
                     }
-                }
-            });
-        }
+                });
+            }
     }
     
     private void runningClock() {
@@ -569,24 +577,18 @@ public class MainFrame extends javax.swing.JFrame {
     
     private String getFormattedDate(LocalDate date){
         DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd.MM.yyyy");
-////        sdf.parseObject(
-//                date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT));
-////        )format(date);
         return date.format(dtf);
     }
     
-    public static LocalDate getNextTableDate(LocalDate seanseDate){
+    public static LocalDate getNextTableDate(){
         LocalDate next;
             if(DayOfWeek.SATURDAY.equals(LocalDate.now().getDayOfWeek())){
-                next = seanseDate.plusDays(3);
-//                getDayOfMonth()+3)+"."+seanseDate.getMonthValue()+"."+seanseDate.getYear();
+                next = getStartSeanseDay().plusDays(3);
             }else{
-                next = seanseDate.plusDays(2);
-//                +"."+seanseDate.getMonthValue()+"."+seanseDate.getYear();
+                next = getStartSeanseDay().plusDays(2);
             }
         return next;
     }
-    
     
     /**
      * @param args the command line arguments
@@ -663,41 +665,27 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField tfPhone;
     // End of variables declaration//GEN-END:variables
 
-    private Seanse getSeanseFromGUI() {
+    private Seanses getSeanseFromGUI() {
         
-        int id;
-//        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-//           Date sDate=null;
-//           Seanse seanse= null;
-
-//            try{
-//                sDate = sdf.parse(jDateChooser1.getDate().toString());
-//                            labResult.setText(jDateChooser1.getDate().toString());
-//
-//            }catch(ParseException pe){
-//                JOptionPane.showMessageDialog(null, "date exeption");
-////                tfDate.setText(sdf.format(LocalDate.now()));
-//            }
-            try{
+        try{
+            
             if(!tfPacFamily.getText().trim().equals("")&&!tfPhone.getText().trim().equals("")&&jDateChooser1.getDate()!=null){
+                int id;
                 if(!hibUtil.getAllSeanse().isEmpty()){
-                 id=hibUtil.getAllSeanse().size()+1;
+                    id = hibUtil.getAllSeanse().size()+1;
                 }else{
-                    id=1;
+                    id=1;                
                 }
-                seanse= new Seanse(id, jDateChooser1.getDate(), (String)jComboTime.getSelectedItem(), tfPacFamily.getText());
-                seanse.setPacientPhone(tfPhone.getText());
-            }else{
                 
+                String date_time= jDateChooser1.getDate()+" "+jComboTime.getSelectedItem();
+//                seanse= new Seanses(id,);
+//                seanse.setPacientPhone(tfPhone.getText());
+            }else{
                 JOptionPane.showMessageDialog(null, "Field can't be empty");
             }
-            }catch(NullPointerException n){
-                
-            }
-            catch(Exception e){
-                JOptionPane.showMessageDialog(null, e.getMessage());
-
-            }
+        }catch(NullPointerException | HeadlessException n){
+            
+        }
       
                    
         return seanse;

@@ -5,7 +5,7 @@
  */
 package com.fordoctor.manage;
 
-import com.forDoctors.entity.Seanse;
+import com.forDoctors.entity.Seanses;
 
 /**
  *
@@ -13,7 +13,7 @@ import com.forDoctors.entity.Seanse;
  */
 public interface MainFunctionsInterface {
     
-    public Seanse getSeanseFromGUI();    
+    public Seanses getSeanseFromGUI();    
     
     
 }
