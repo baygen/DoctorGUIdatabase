@@ -6,12 +6,12 @@
 package com.forDoctors.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -43,7 +43,7 @@ public class Seanses implements Serializable {
     @Basic(optional = false)
     @Column(name = "seansesTime")
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar seansesTime;
+    private java.util.Calendar seansesTime;
     @Basic(optional = false)
     @Column(name = "pacientName")
     private String pacientName;
@@ -117,7 +117,7 @@ public class Seanses implements Serializable {
 
     @Override
     public String toString() {
-        return "com.forDoctors.entity.Seanses[ seansesTime=" + seansesTime + " ]";
+        return "seans = " + seansesTime +pacientName +" .";
     }
     
 }

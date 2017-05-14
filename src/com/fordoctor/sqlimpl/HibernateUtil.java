@@ -6,6 +6,7 @@
 package com.fordoctor.sqlimpl;
 
 import com.forDoctors.entity.Seanses;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -29,6 +30,7 @@ public class HibernateUtil
 {
 
     private static final SessionFactory sessionFactory;
+//    private static String getByDate;
     
     static {
         try {
@@ -51,25 +53,60 @@ public class HibernateUtil
 
     
 //    @Override
-    public void addSeanse (Object seanse) throws HibernateException{
+    public void addSeanse (Object seanse, String date_time) {
+       
         Session ses = getSessionFactory().openSession();
         
-            Transaction tr = ses.beginTransaction();
-            ses.save(seanse);
-            tr.commit();
+        Transaction tr = ses.beginTransaction();
+        Seanses s= (Seanses)seanse;
+        String queryByDate="SELECT s FROM Seanses s where s.seansesTime like '"+date_time+"%'";
+        
+        try{
+            
+            Query query =ses.createQuery(queryByDate);
+            List<Seanses> res=query.list();
+            if(res.isEmpty()){
+                ses.save(seanse);
+                tr.commit();
+            }else{
+                if((JOptionPane.showConfirmDialog(null, "Перезаписати сеанс?"))==JOptionPane.YES_OPTION){
+                ses.saveOrUpdate(seanse);
+                tr.commit();
+                }
+            }
+            
+            System.out.println("Commited in addSeanse: "+tr.wasCommitted());
             ses.close();
+        }catch(HibernateException e){
+//            tr.rollback();
+        }
+        
         
     }
     
     
-    public int updateObj(Object seanse) {
+    public int updateObj(Object seanse, String date) {
         Session ses =getSessionFactory().openSession();
         Transaction tr= ses.beginTransaction();
+
         Seanses seans = (Seanses)seanse; 
-        ses.update(seans);
+//        String getByDate=
+        
+        Query query = ses.createQuery(""
+//                getByDate
+        );
+        List<Seanses> list = query.list();
+        Seanses old=list.get(0);
+//tr.wasCommitted();
+        old.setPacientName(seans.getPacientName());
+        old.setPacientPhone(seans.getPacientPhone());
+        boolean cont=ses.contains(old);
+        System.out.println("Contains: "+cont);
+        System.out.println("Commited: "+tr.wasCommitted());
         tr.commit();
+        System.out.println(tr.wasCommitted());
         ses.close();
-        return seans.getSeansesID();
+        return ((Seanses)seanse).getSeansesID();
     }
 
 
@@ -108,15 +145,17 @@ public class HibernateUtil
         return res;
     }
 
+    
     public List<?> getAllSeanse() {
         Session session=getSessionFactory().openSession();
         session.beginTransaction();
         Query query;
-        query = session.createSQLQuery("SELECT * FROM Seanses");
+        query = session.createQuery("SELECT s FROM Seanses s");
 //        getNamedQuery("Seanse.findAll");
-        List<Seanses> res = query.list();
+        List<?> res = query.list();
         session.getTransaction().commit();
         try{
+            
             session.close();
         }catch(HibernateException he){
             JOptionPane.showMessageDialog(null, he.getMessage());
@@ -124,15 +163,21 @@ public class HibernateUtil
         return res;
     }
 
-    public int remove(Seanses seanse) {
-        Session session = getSessionFactory().getCurrentSession();
+    public void removeByDate(String date) throws HibernateException{
+        Session session = getSessionFactory().openSession();
+        String rem = "DELETE FROM Seanses s WHERE s.seansesTime LIKE '"+date+"%'";
         session.beginTransaction();
-        int id = seanse.getSeansesID();
-        session.delete(seanse);
+        Query query =session.createQuery(rem);
+        query.executeUpdate();
+//        session.delete(seans);
         session.getTransaction().commit();
         session.close();
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        return id;
+//        return count;
+    }
+
+    public void remove(Calendar seansesTime) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 

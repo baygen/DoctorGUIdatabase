@@ -7,35 +7,36 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Random;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import org.hibernate.HibernateException;
-
+ 
 /**
  *
  * @author Buy
  */
-public class MainFrame extends javax.swing.JFrame {
+public class MainFrame extends JFrame {
 
     private final HibernateUtil hibUtil;
-    private Seanses seanse;
     private final SimpleDateFormat sdfDateTime= new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private final SimpleDateFormat sdfDate= new SimpleDateFormat("yyyy-MM-dd");
+    public String date_time;
+    
 
     public MainFrame() {
         hibUtil = new HibernateUtil();
         initComponents();
         runningClock();
-        setSeanseFromDatabaseToTable(getStartSeanseDay(), jTableToday);
-        setSeanseFromDatabaseToTable(getNextTableDate(), jTableNextDay);
+        displayDataToTables();
     }
 
     @SuppressWarnings("unchecked")
@@ -65,6 +66,7 @@ public class MainFrame extends javax.swing.JFrame {
         jComboTime = new javax.swing.JComboBox<>();
         labResult = new javax.swing.JLabel();
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
+        RemoveChoosen = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
@@ -240,7 +242,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 411, Short.MAX_VALUE)
+            .addGap(0, 421, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -280,6 +282,13 @@ public class MainFrame extends javax.swing.JFrame {
         jDateChooser1.setDateFormatString("dd-MM-yyyy");
         jDateChooser1.setDebugGraphicsOptions(javax.swing.DebugGraphics.BUFFERED_OPTION);
 
+        RemoveChoosen.setText("Remove Choosen");
+        RemoveChoosen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RemoveChoosenActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelNewSeanseLayout = new javax.swing.GroupLayout(jPanelNewSeanse);
         jPanelNewSeanse.setLayout(jPanelNewSeanseLayout);
         jPanelNewSeanseLayout.setHorizontalGroup(
@@ -304,8 +313,12 @@ public class MainFrame extends javax.swing.JFrame {
                                 .addGap(22, 22, 22))
                             .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))))
                 .addGap(18, 18, 18)
-                .addComponent(jButNewPacient)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
+                        .addComponent(jButNewPacient)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(RemoveChoosen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanelNewSeanseLayout.setVerticalGroup(
             jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -329,7 +342,9 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jComboTime, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addComponent(labResult, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labResult, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(RemoveChoosen))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -346,7 +361,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelTodayTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelTomorrowTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(208, Short.MAX_VALUE))
+                .addContainerGap(198, Short.MAX_VALUE))
         );
         forTableMainPanelLayout.setVerticalGroup(
             forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -469,59 +484,60 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void jButNewPacientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButNewPacientActionPerformed
-                          
-//        String date_time= sdfDate.format(jDateChooser1.getDate())+" "+jComboTime.getSelectedItem().toString();
-//        
-//        Date date =null;          
-//            try {
-//                date= sdfDateTime.parse(date_time);
-//            }catch (ParseException ex) {
-//                JOptionPane.showMessageDialog(null, ex.getMessage());
-//            }
-////        dateTime.toLocalDateTime().
-//        Calendar cal= sdfDate.getCalendar();
-//        
-//        JOptionPane.showMessageDialog(null, date_time+"date:"+date);
         
-        
-       Thread thread = new Thread("save pacient to DB"){
+       Thread thread = new Thread("Saving seanses to DB"){
             
             @Override
             public void run(){
-                Seanses seans =getSeanseFromGUI();
-                try{
-                    
-                    
-                        hibUtil.addSeanse(seans);
+                Seanses seans = getSeanseFromGUI();
+                if(seans.getSeansesTime().before(Calendar.getInstance())){
+                    JOptionPane.showMessageDialog(null, "Can't do this operation");
+                }else{
+                    try{
+                        hibUtil.addSeanse(seans,date_time);
                         JOptionPane.showMessageDialog(null, "Seanse is created");
                                        
-                }catch(HibernateException e){
-                    if(seans.getSeansesTime().before(Calendar.getInstance())){
-                    JOptionPane.showMessageDialog(null, "Can't do this operation");
-                    }else{
-                        if(JOptionPane.showConfirmDialog(null, "Replace exustied item?")==JOptionPane.YES_OPTION){
-                            hibUtil.updateObj(seans);
-
-                        }
-
+                    }catch(HibernateException e){
+                    }finally{
+                        displayDataToTables();
                     }
-                }finally{
-                            setSeanseFromDatabaseToTable(getStartSeanseDay(), jTableToday);
-                            setSeanseFromDatabaseToTable(getNextTableDate(), jTableNextDay);
                 }
-                
             }
        };
        thread.start();
       
-//       HibernateUtil.
-    
     }//GEN-LAST:event_jButNewPacientActionPerformed
 
+    private void RemoveChoosenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveChoosenActionPerformed
+        int choosenIndex=jTableToday.getSelectedRow();
+        DefaultTableModel dtm =(DefaultTableModel)jTableToday.getModel();
+        
+        Runnable runnable = () -> {
+            DateTimeFormatter dtDateTime=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDate choosenDate= LocalDate.parse((""+dtm.getValueAt(choosenIndex, 0)));
+            LocalTime choosenTime= LocalTime.parse((""+dtm.getValueAt(choosenIndex, 1)));
+            
+            LocalDateTime locDT=LocalDateTime.of(choosenDate, choosenTime);
+            String dateTime=locDT.format(dtDateTime);
+            hibUtil.removeByDate(dateTime);
+            
+            dtm.setValueAt(null, choosenIndex, 0);
+            dtm.setValueAt(null, choosenIndex, 2);
+            dtm.setValueAt(null, choosenIndex, 3);
+
+            JOptionPane.showMessageDialog(null, "Deleted");
+        };
+        new Thread(runnable).start();
+        
+    }//GEN-LAST:event_RemoveChoosenActionPerformed
+
+    private String getStringDateFromCalendar(Calendar cal){
+        
+        return cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+cal.get(Calendar.DAY_OF_MONTH);
+    }
     private void setSeanseFromDatabaseToTable(LocalDate date, JTable table){
-        
-//        String day = sdfDate.format(date);
-        
+//        LocalDateTime ldt= LocalDateTime.now();
+//        ldt.
         String day=date.format(DateTimeFormatter.ISO_LOCAL_DATE);
                 
         List lis=HibernateUtil.getListBy_Date(day);
@@ -538,14 +554,20 @@ public class MainFrame extends javax.swing.JFrame {
                     String sqlTime=s.getSeansesTime().get(Calendar.HOUR_OF_DAY)+":"+min;
                     for(int i = 0;i<dtm.getRowCount();i++){
                         String tableTime = (String)dtm.getValueAt(i, 1);
-                
+                        LocalDateTime ldt=LocalDateTime.ofInstant(s.getSeansesTime().toInstant(),ZoneId.systemDefault());
                             if(tableTime.equals(sqlTime)){
+                                dtm.setValueAt(getFormattedDate(ldt.toLocalDate()), i, 0);
                                 dtm.setValueAt(s.getPacientName(), i, 2);
                                 dtm.setValueAt(s.getPacientPhone(), i, 3);
                             }
                     }
                 });
             }
+    }
+    
+    private void displayDataToTables(){
+        setSeanseFromDatabaseToTable(getStartSeanseDay(), jTableToday);
+        setSeanseFromDatabaseToTable(getNextTableDate(), jTableNextDay);
     }
     
     private void runningClock() {
@@ -592,7 +614,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private String getFormattedDate(LocalDate date){
-        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.format(dtf);
     }
     
@@ -637,18 +659,30 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private Seanses getSeanseFromGUI() {
-        
+        Seanses seanse=null;
         try{
             
-            if(!tfPacFamily.getText().trim().equals("")&&!tfPhone.getText().trim().equals("")&&jDateChooser1.getDate()!=null){
+            if(!tfPacFamily.getText().trim().equals("")&&jDateChooser1.getDate()!=null){
+                
+                Random ran = new Random();
                 int id;
-                if(!hibUtil.getAllSeanse().isEmpty()){
-                    id = hibUtil.getAllSeanse().size()+1;
+//                = ran.nextInt()*ran.nextInt();
+                List<?> list= hibUtil.getAllSeanse();
+                System.out.println(""+list.size()+" null : "+list.isEmpty());
+                
+                if(!list.isEmpty()){
+                    id = list.size()+1;
+                    for(Object ob:list){
+                        Seanses sea=(Seanses)ob;
+                        if(id==sea.getSeansesID()){
+                            id++;
+                        }
+                    }
                 }else{
                     id=1;                
                 }
                 
-                String date_time= sdfDate.format(jDateChooser1.getDate())+" "+jComboTime.getSelectedItem();
+                date_time= sdfDate.format(jDateChooser1.getDate())+" "+jComboTime.getSelectedItem();
                 sdfDateTime.parse(date_time);
                 Calendar cal=sdfDateTime.getCalendar();
                 
@@ -658,10 +692,8 @@ public class MainFrame extends javax.swing.JFrame {
             }else{
                 JOptionPane.showMessageDialog(null, "Field can't be empty");
             }
-        }catch(NullPointerException | HeadlessException n){
+        }catch(NullPointerException | HeadlessException | ParseException n){
             
-        } catch (ParseException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         return seanse;
     }
@@ -669,6 +701,7 @@ public class MainFrame extends javax.swing.JFrame {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton RemoveChoosen;
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem contentsMenuItem;
     private javax.swing.JMenuItem copyMenuItem;
@@ -709,8 +742,5 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField tfPhone;
     // End of variables declaration//GEN-END:variables
 
-    
-
-
-
+  
 }
