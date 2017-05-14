@@ -58,9 +58,8 @@ public class HibernateUtil
         Session ses = getSessionFactory().openSession();
         
         Transaction tr = ses.beginTransaction();
-        Seanses s= (Seanses)seanse;
         String queryByDate="SELECT s FROM Seanses s where s.seansesTime like '"+date_time+"%'";
-        
+       
         try{
             
             Query query =ses.createQuery(queryByDate);
@@ -70,15 +69,15 @@ public class HibernateUtil
                 tr.commit();
             }else{
                 if((JOptionPane.showConfirmDialog(null, "Перезаписати сеанс?"))==JOptionPane.YES_OPTION){
-                ses.saveOrUpdate(seanse);
+                    ses.delete(res.get(0));
+                    ses.save(seanse);
                 tr.commit();
                 }
             }
             
-            System.out.println("Commited in addSeanse: "+tr.wasCommitted());
             ses.close();
         }catch(HibernateException e){
-//            tr.rollback();
+
         }
         
         

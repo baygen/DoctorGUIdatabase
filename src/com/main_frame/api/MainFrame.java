@@ -154,6 +154,12 @@ public class MainFrame extends JFrame {
         jTableToday.setAlignmentY(2.0F);
         jTableToday.setAutoscrolls(false);
         jTableToday.setRowHeight(21);
+        jTableToday.setSelectionBackground(new java.awt.Color(153, 153, 153));
+        jTableToday.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTableTodayMousePressed(evt);
+            }
+        });
         jScrollPaneToday.setViewportView(jTableToday);
 
         javax.swing.GroupLayout panelTodayTableLayout = new javax.swing.GroupLayout(panelTodayTable);
@@ -214,6 +220,11 @@ public class MainFrame extends JFrame {
         });
         jTableNextDay.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTableNextDay.setRowHeight(21);
+        jTableNextDay.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTableNextDayMousePressed(evt);
+            }
+        });
         jScrollPaneTomorrow.setViewportView(jTableNextDay);
 
         labelNextDate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -242,7 +253,7 @@ public class MainFrame extends JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 421, Short.MAX_VALUE)
+            .addGap(0, 435, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -252,18 +263,19 @@ public class MainFrame extends JFrame {
         jPanelNewSeanse.setBorder(javax.swing.BorderFactory.createEtchedBorder(java.awt.Color.white, java.awt.Color.lightGray));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel1.setText("Pacient Family:");
+        jLabel1.setText("Фамілія та ім'я:");
 
         tfPacFamily.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        tfPacFamily.setPreferredSize(new java.awt.Dimension(8, 23));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel2.setText("Pacient phone:");
+        jLabel2.setText("Номер телефону:");
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel3.setText("Date:");
+        jLabel3.setText("Дата прийому:");
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel4.setText("Time:");
+        jLabel4.setText("Виберіть годину:");
 
         tfPhone.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
@@ -295,28 +307,25 @@ public class MainFrame extends JFrame {
             jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(labResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
                         .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
+                        .addGap(18, 18, Short.MAX_VALUE)
                         .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
-                                .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(tfPacFamily)
-                                    .addComponent(tfPhone)
-                                    .addComponent(jComboTime, 0, 130, Short.MAX_VALUE))
-                                .addGap(22, 22, 22))
-                            .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))))
+                            .addComponent(tfPhone)
+                            .addComponent(tfPacFamily, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+                            .addComponent(jComboTime, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelNewSeanseLayout.createSequentialGroup()
                         .addComponent(jButNewPacient)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 10, Short.MAX_VALUE))
                     .addComponent(RemoveChoosen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -327,21 +336,21 @@ public class MainFrame extends JFrame {
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButNewPacient)
                     .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tfPacFamily, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfPacFamily, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tfPhone, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                    .addComponent(tfPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
-                    .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboTime, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                    .addComponent(jComboTime, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
                 .addGroup(jPanelNewSeanseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labResult, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(RemoveChoosen))
@@ -361,7 +370,7 @@ public class MainFrame extends JFrame {
                 .addGroup(forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelTodayTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelTomorrowTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(198, Short.MAX_VALUE))
+                .addContainerGap(184, Short.MAX_VALUE))
         );
         forTableMainPanelLayout.setVerticalGroup(
             forTableMainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -509,9 +518,15 @@ public class MainFrame extends JFrame {
     }//GEN-LAST:event_jButNewPacientActionPerformed
 
     private void RemoveChoosenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveChoosenActionPerformed
-        int choosenIndex=jTableToday.getSelectedRow();
-        DefaultTableModel dtm =(DefaultTableModel)jTableToday.getModel();
-        
+        int choosenIndex;
+        DefaultTableModel dtm;
+            if(jTableToday.getSelectedRow()!=-1){
+                dtm=(DefaultTableModel)jTableToday.getModel();
+                choosenIndex=jTableToday.getSelectedRow();
+            }else{
+                dtm=(DefaultTableModel)jTableNextDay.getModel();
+                choosenIndex=jTableNextDay.getSelectedRow();
+            }
         Runnable runnable = () -> {
             DateTimeFormatter dtDateTime=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDate choosenDate= LocalDate.parse((""+dtm.getValueAt(choosenIndex, 0)));
@@ -530,6 +545,19 @@ public class MainFrame extends JFrame {
         new Thread(runnable).start();
         
     }//GEN-LAST:event_RemoveChoosenActionPerformed
+
+    private void jTableTodayMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTodayMousePressed
+        if(jTableNextDay.getSelectedRows().length>0){
+            jTableNextDay.clearSelection();
+        }
+    }//GEN-LAST:event_jTableTodayMousePressed
+
+    private void jTableNextDayMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableNextDayMousePressed
+        
+        if(jTableToday.getSelectedRows().length>0){
+            jTableToday.clearSelection();
+        }
+    }//GEN-LAST:event_jTableNextDayMousePressed
 
     private String getStringDateFromCalendar(Calendar cal){
         
@@ -664,35 +692,35 @@ public class MainFrame extends JFrame {
             
             if(!tfPacFamily.getText().trim().equals("")&&jDateChooser1.getDate()!=null){
                 
-                Random ran = new Random();
                 int id;
-//                = ran.nextInt()*ran.nextInt();
                 List<?> list= hibUtil.getAllSeanse();
                 System.out.println(""+list.size()+" null : "+list.isEmpty());
                 
                 if(!list.isEmpty()){
                     id = list.size()+1;
                     for(Object ob:list){
+                        int count=0;
                         Seanses sea=(Seanses)ob;
                         if(id==sea.getSeansesID()){
-                            id++;
+                            count++;
                         }
+                        id=id+count+1;
                     }
                 }else{
                     id=1;                
                 }
-                
+                System.out.println("id = "+id);
+
                 date_time= sdfDate.format(jDateChooser1.getDate())+" "+jComboTime.getSelectedItem();
                 sdfDateTime.parse(date_time);
-                Calendar cal=sdfDateTime.getCalendar();
                 
-//                cal.setTime(sdfDateTime.parse(date_time));
+                Calendar cal=sdfDateTime.getCalendar();
                 seanse= new Seanses(cal, id,tfPacFamily.getText());
                 seanse.setPacientPhone(tfPhone.getText());
             }else{
                 JOptionPane.showMessageDialog(null, "Field can't be empty");
             }
-        }catch(NullPointerException | HeadlessException | ParseException n){
+        }catch(NullPointerException | HeadlessException | ParseException e){
             
         }
         return seanse;
