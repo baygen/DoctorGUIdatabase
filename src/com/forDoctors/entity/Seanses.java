@@ -7,11 +7,10 @@ package com.forDoctors.entity;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -25,30 +24,29 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Buy
  */
 @Entity
-@Table(name = "seanses")
+@Table(name = "seans")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Seanses.findAll", query = "SELECT s FROM Seanses s")
-    , @NamedQuery(name = "Seanses.findBySeansesID", query = "SELECT s FROM Seanses s WHERE s.seansesID = :seansesID")
     , @NamedQuery(name = "Seanses.findBySeansesTime", query = "SELECT s FROM Seanses s WHERE s.seansesTime = :seansesTime")
     , @NamedQuery(name = "Seanses.findByPacientName", query = "SELECT s FROM Seanses s WHERE s.pacientName = :pacientName")
-    , @NamedQuery(name = "Seanses.findByPacientPhone", query = "SELECT s FROM Seanses s WHERE s.pacientPhone = :pacientPhone")})
+    , @NamedQuery(name = "Seanses.findByPacientPhone", query = "SELECT s FROM Seanses s WHERE s.pacientPhone = :pacientPhone")
+    , @NamedQuery(name = "Seanses.findByIsFirstTime", query = "SELECT s FROM Seanses s WHERE s.isFirstTime = :isFirstTime")})
 public class Seanses implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Basic(optional = false)
-    @Column(name = "seansesID")
-    private int seansesID;
     @Id
     @Basic(optional = false)
     @Column(name = "seansesTime")
     @Temporal(TemporalType.TIMESTAMP)
-    private java.util.Calendar seansesTime;
+    private Calendar seansesTime;
     @Basic(optional = false)
     @Column(name = "pacientName")
     private String pacientName;
     @Column(name = "pacientPhone")
     private String pacientPhone;
+    @Column(name = "isFirstTime")
+    private Boolean isFirstTime;
 
     public Seanses() {
     }
@@ -57,18 +55,10 @@ public class Seanses implements Serializable {
         this.seansesTime = seansesTime;
     }
 
-    public Seanses(Calendar seansesTime, int seansesID, String pacientName) {
-        this.seansesTime = seansesTime;
-        this.seansesID = seansesID;
-        this.pacientName = pacientName;
-    }
-
-    public int getSeansesID() {
-        return seansesID;
-    }
-
-    public void setSeansesID(int seansesID) {
-        this.seansesID = seansesID;
+    public Seanses(Calendar seanses_time, String pacient_name,Boolean is_first_time) {
+        this.seansesTime = seanses_time;
+        this.pacientName = pacient_name;
+        this.isFirstTime=is_first_time;
     }
 
     public Calendar getSeansesTime() {
@@ -95,6 +85,14 @@ public class Seanses implements Serializable {
         this.pacientPhone = pacientPhone;
     }
 
+    public Boolean getIsFirstTime() {
+        return isFirstTime;
+    }
+
+    public void setIsFirstTime(Boolean isFirstTime) {
+        this.isFirstTime = isFirstTime;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -117,7 +115,7 @@ public class Seanses implements Serializable {
 
     @Override
     public String toString() {
-        return "seans = " + seansesTime +pacientName +" .";
+        return seansesTime + ": "+pacientName+", "+isFirstTime;
     }
     
 }
