@@ -83,31 +83,6 @@ public class HibernateUtil
         
     }
     
-    
-    public int updateObj(Object seanse, String date) {
-        Session ses =getSessionFactory().openSession();
-        Transaction tr= ses.beginTransaction();
-
-        Seanses seans = (Seanses)seanse; 
-//        String getByDate=
-        
-        Query query = ses.createQuery(""
-//                getByDate
-        );
-        List<Seanses> list = query.list();
-        Seanses old=list.get(0);
-//tr.wasCommitted();
-        old.setPacientName(seans.getPacientName());
-        old.setPacientPhone(seans.getPacientPhone());
-        boolean cont=ses.contains(old);
-        System.out.println("Contains: "+cont);
-        System.out.println("Commited: "+tr.wasCommitted());
-        tr.commit();
-        System.out.println(tr.wasCommitted());
-        ses.close();
-        return ((Seanses)seanse).getSeansesID();
-    }
-
 
     public static List<?> getListBy_Date(String date) {
         
@@ -128,7 +103,7 @@ public class HibernateUtil
         return res;        
     }
 
-    public List<?> getListByName(String name) {
+    public List<?> getSeanseByPacientName(String name) {
         
         Session ses =getSessionFactory().openSession();
         ses.beginTransaction();
@@ -179,6 +154,5 @@ public class HibernateUtil
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
-    
+     
 }

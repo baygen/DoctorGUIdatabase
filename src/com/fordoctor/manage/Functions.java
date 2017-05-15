@@ -21,8 +21,10 @@ public class Functions {
             for(int i=0;i<10;i++){
                 addedDay=firstDate;
                 dates[i]=addedDay.toString();
-                
             }
+//            SeanseTableModel stm= new SeanseTableModel();
         return dates;
     }
+    
+    
 }

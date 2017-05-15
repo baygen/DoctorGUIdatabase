@@ -1,6 +1,7 @@
 package com.main_frame.api;
 
 import com.forDoctors.entity.Seanses;
+import com.fordoctor.manage.SeanseTableModel;
 import com.fordoctor.sqlimpl.HibernateUtil;
 import java.awt.HeadlessException;
 import java.text.ParseException;
@@ -13,7 +14,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -29,14 +29,20 @@ public class MainFrame extends JFrame {
     private final HibernateUtil hibUtil;
     private final SimpleDateFormat sdfDateTime= new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private final SimpleDateFormat sdfDate= new SimpleDateFormat("yyyy-MM-dd");
+    private String today;
+    private String nextDay;
     public String date_time;
+    private final SeanseTableModel seanseTableModel;
     
 
     public MainFrame() {
         hibUtil = new HibernateUtil();
+        seanseTableModel =new SeanseTableModel();
+        today=getFormattedDate(getStartSeanseDay());
+        nextDay=getFormattedDate(getNextTableDate());
         initComponents();
         runningClock();
-        displayDataToTables();
+//        displayDataToTables();
     }
 
     @SuppressWarnings("unchecked")
@@ -117,39 +123,7 @@ public class MainFrame extends JFrame {
         labelTodayDate.setText(getFormattedDate(getStartSeanseDay()));
 
         jTableToday.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTableToday.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, "10:00", null, null},
-                {null, "10:40", null, null},
-                {null, "11:20", null, null},
-                {null, "12:00", null, null},
-                {null, "12:40", null, null},
-                {null, "14:00", null, null},
-                {null, "14:40", null, null},
-                {null, "15:20", null, null},
-                {null, "16:00", null, null},
-                {null, "16:40", null, null},
-                {null, "17:20", null, null}
-            },
-            new String [] {
-                "Date", "Time", "Pacient Name", "Pacient Phone"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, true, true
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        jTableToday.setModel(seanseTableModel.getModel(getFormattedDate(getStartSeanseDay())));
         jTableToday.setAlignmentX(2.0F);
         jTableToday.setAlignmentY(2.0F);
         jTableToday.setAutoscrolls(false);
@@ -185,39 +159,9 @@ public class MainFrame extends JFrame {
         panelTomorrowTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.white, java.awt.Color.lightGray));
 
         jTableNextDay.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTableNextDay.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, "10:00", null, null},
-                {null, "10:40", null, null},
-                {null, "11:20", null, null},
-                {null, "12:00", null, null},
-                {null, "12:40", null, null},
-                {null, "14:00", null, null},
-                {null, "14:40", null, null},
-                {null, "15:20", null, null},
-                {null, "16:00", null, null},
-                {null, "16:40", null, null},
-                {null, "17:20", null, null}
-            },
-            new String [] {
-                "Date", "Time", "Pacient Name", "Pacient Phone"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, true, true
-            };
+        jTableNextDay.setModel(seanseTableModel.getModel(getFormattedDate(getStartSeanseDay()))
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        );
         jTableNextDay.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTableNextDay.setRowHeight(21);
         jTableNextDay.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -498,19 +442,23 @@ public class MainFrame extends JFrame {
             
             @Override
             public void run(){
+                long start=LocalTime.now().toNanoOfDay();
                 Seanses seans = getSeanseFromGUI();
                 if(seans.getSeansesTime().before(Calendar.getInstance())){
                     JOptionPane.showMessageDialog(null, "Can't do this operation");
                 }else{
                     try{
                         hibUtil.addSeanse(seans,date_time);
+                        long end=LocalTime.now().toNanoOfDay();
                         JOptionPane.showMessageDialog(null, "Seanse is created");
-                                       
+                        System.out.println((end-start)+"run() in thread before dialog");
                     }catch(HibernateException e){
                     }finally{
                         displayDataToTables();
                     }
                 }
+                long end=LocalTime.now().toNanoOfDay();
+                System.out.println((end-start)+"run() in thread at btnNewPacient(()");
             }
        };
        thread.start();
@@ -518,8 +466,10 @@ public class MainFrame extends JFrame {
     }//GEN-LAST:event_jButNewPacientActionPerformed
 
     private void RemoveChoosenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveChoosenActionPerformed
-        int choosenIndex;
-        DefaultTableModel dtm;
+        Runnable runnable;
+        runnable = () -> {
+            int choosenIndex;
+            DefaultTableModel dtm;
             if(jTableToday.getSelectedRow()!=-1){
                 dtm=(DefaultTableModel)jTableToday.getModel();
                 choosenIndex=jTableToday.getSelectedRow();
@@ -527,7 +477,7 @@ public class MainFrame extends JFrame {
                 dtm=(DefaultTableModel)jTableNextDay.getModel();
                 choosenIndex=jTableNextDay.getSelectedRow();
             }
-        Runnable runnable = () -> {
+            
             DateTimeFormatter dtDateTime=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDate choosenDate= LocalDate.parse((""+dtm.getValueAt(choosenIndex, 0)));
             LocalTime choosenTime= LocalTime.parse((""+dtm.getValueAt(choosenIndex, 1)));
@@ -539,7 +489,7 @@ public class MainFrame extends JFrame {
             dtm.setValueAt(null, choosenIndex, 0);
             dtm.setValueAt(null, choosenIndex, 2);
             dtm.setValueAt(null, choosenIndex, 3);
-
+            
             JOptionPane.showMessageDialog(null, "Deleted");
         };
         new Thread(runnable).start();
@@ -559,13 +509,8 @@ public class MainFrame extends JFrame {
         }
     }//GEN-LAST:event_jTableNextDayMousePressed
 
-    private String getStringDateFromCalendar(Calendar cal){
-        
-        return cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"+cal.get(Calendar.DAY_OF_MONTH);
-    }
     private void setSeanseFromDatabaseToTable(LocalDate date, JTable table){
-//        LocalDateTime ldt= LocalDateTime.now();
-//        ldt.
+
         String day=date.format(DateTimeFormatter.ISO_LOCAL_DATE);
                 
         List lis=HibernateUtil.getListBy_Date(day);
@@ -590,7 +535,7 @@ public class MainFrame extends JFrame {
                             }
                     }
                 });
-            }
+            }            
     }
     
     private void displayDataToTables(){
@@ -687,35 +632,24 @@ public class MainFrame extends JFrame {
     }
     
     private Seanses getSeanseFromGUI() {
+        long start=LocalTime.now().toNanoOfDay();
         Seanses seanse=null;
         try{
-            
-            if(!tfPacFamily.getText().trim().equals("")&&jDateChooser1.getDate()!=null){
+            String pacName=tfPacFamily.getText();
+            if(!pacName.trim().equals("")&&jDateChooser1.getDate()!=null){
                 
-                int id;
-                List<?> list= hibUtil.getAllSeanse();
-                System.out.println(""+list.size()+" null : "+list.isEmpty());
+                boolean firstTime=true;
+                
+                List<?> list = hibUtil.getSeanseByPacientName(pacName);
                 
                 if(!list.isEmpty()){
-                    id = list.size()+1;
-                    for(Object ob:list){
-                        int count=0;
-                        Seanses sea=(Seanses)ob;
-                        if(id==sea.getSeansesID()){
-                            count++;
-                        }
-                        id=id+count+1;
-                    }
-                }else{
-                    id=1;                
-                }
-                System.out.println("id = "+id);
-
+                    firstTime=false;
+                }                
                 date_time= sdfDate.format(jDateChooser1.getDate())+" "+jComboTime.getSelectedItem();
                 sdfDateTime.parse(date_time);
                 
                 Calendar cal=sdfDateTime.getCalendar();
-                seanse= new Seanses(cal, id,tfPacFamily.getText());
+                seanse= new Seanses(cal, tfPacFamily.getText(),firstTime);
                 seanse.setPacientPhone(tfPhone.getText());
             }else{
                 JOptionPane.showMessageDialog(null, "Field can't be empty");
@@ -723,7 +657,10 @@ public class MainFrame extends JFrame {
         }catch(NullPointerException | HeadlessException | ParseException e){
             
         }
+        long end=LocalTime.now().toNanoOfDay();
+        System.out.println((end-start)+"ns  method getSeanseFromGUI");
         return seanse;
+        
     }
     
     
