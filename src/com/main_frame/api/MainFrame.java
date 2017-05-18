@@ -1,7 +1,6 @@
 package com.main_frame.api;
 
 import com.forDoctors.entity.Seanses;
-import com.fordoctor.manage.SeanseTableModel;
 import com.fordoctor.sqlimpl.HibernateUtil;
 import java.awt.HeadlessException;
 import java.text.ParseException;
@@ -14,6 +13,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -26,6 +27,8 @@ import org.hibernate.HibernateException;
  */
 public class MainFrame extends JFrame {
 
+    private static final long serialVersionUID = 1L;
+
     private final HibernateUtil hibUtil;
     private final SimpleDateFormat sdfDateTime= new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private final SimpleDateFormat sdfDate= new SimpleDateFormat("yyyy-MM-dd");
@@ -33,16 +36,18 @@ public class MainFrame extends JFrame {
     private String nextDay;
     public String date_time;
     private final SeanseTableModel seanseTableModel;
+    private String updatedDate;
     
 
     public MainFrame() {
         hibUtil = new HibernateUtil();
-        seanseTableModel =new SeanseTableModel();
+        seanseTableModel = new SeanseTableModel();
         today=getFormattedDate(getStartSeanseDay());
         nextDay=getFormattedDate(getNextTableDate());
+        getDatesForTable();
         initComponents();
         runningClock();
-//        displayDataToTables();
+        displayDataToTables();
     }
 
     @SuppressWarnings("unchecked")
@@ -123,7 +128,7 @@ public class MainFrame extends JFrame {
         labelTodayDate.setText(getFormattedDate(getStartSeanseDay()));
 
         jTableToday.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTableToday.setModel(seanseTableModel.getModel(getFormattedDate(getStartSeanseDay())));
+        jTableToday.setModel(seanseTableModel.getModel(today));
         jTableToday.setAlignmentX(2.0F);
         jTableToday.setAlignmentY(2.0F);
         jTableToday.setAutoscrolls(false);
@@ -159,7 +164,7 @@ public class MainFrame extends JFrame {
         panelTomorrowTable.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.white, java.awt.Color.lightGray));
 
         jTableNextDay.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTableNextDay.setModel(seanseTableModel.getModel(getFormattedDate(getStartSeanseDay()))
+        jTableNextDay.setModel(seanseTableModel.getModel(nextDay)
 
         );
         jTableNextDay.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -448,13 +453,16 @@ public class MainFrame extends JFrame {
                     JOptionPane.showMessageDialog(null, "Can't do this operation");
                 }else{
                     try{
-                        hibUtil.addSeanse(seans,date_time);
-                        long end=LocalTime.now().toNanoOfDay();
+                        hibUtil.addSeanse(seans,updatedDate);
+//                        long end=LocalTime.now().toNanoOfDay();
+                        if(date_time.equals(today)){
+                               setSeanseFromDatabaseToTable(getStartSeanseDay(), jTableToday);
+                           }else if(date_time.equals(nextDay)){
+                               setSeanseFromDatabaseToTable(getNextTableDate(), jTableNextDay);
+                           }
                         JOptionPane.showMessageDialog(null, "Seanse is created");
-                        System.out.println((end-start)+"run() in thread before dialog");
+//                        System.out.println((end-start)+"run() in thread before dialog");
                     }catch(HibernateException e){
-                    }finally{
-                        displayDataToTables();
                     }
                 }
                 long end=LocalTime.now().toNanoOfDay();
@@ -467,30 +475,35 @@ public class MainFrame extends JFrame {
 
     private void RemoveChoosenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveChoosenActionPerformed
         Runnable runnable;
-        runnable = () -> {
-            int choosenIndex;
-            DefaultTableModel dtm;
-            if(jTableToday.getSelectedRow()!=-1){
-                dtm=(DefaultTableModel)jTableToday.getModel();
-                choosenIndex=jTableToday.getSelectedRow();
-            }else{
-                dtm=(DefaultTableModel)jTableNextDay.getModel();
-                choosenIndex=jTableNextDay.getSelectedRow();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                int choosenIndex=0;
+                DefaultTableModel dtm= null;
+                if(jTableToday.getSelectedRow()!=-1){
+                    dtm=(DefaultTableModel)jTableToday.getModel();
+                    choosenIndex=jTableToday.getSelectedRow();
+                }else if(jTableNextDay.getSelectedRow()!=-1){
+                    dtm=(DefaultTableModel)jTableNextDay.getModel();
+                    choosenIndex=jTableNextDay.getSelectedRow();
+                }
+                if(dtm!=null){
+                    
+                    DateTimeFormatter dtDateTime=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    LocalDate choosenDate= LocalDate.parse((""+dtm.getValueAt(choosenIndex, 0)));
+                    LocalTime choosenTime= LocalTime.parse((""+dtm.getValueAt(choosenIndex, 1)));
+                    
+                    LocalDateTime locDT=LocalDateTime.of(choosenDate, choosenTime);
+                    String dateTime=locDT.format(dtDateTime);
+                    hibUtil.removeByDate(dateTime);
+                    
+                    dtm.setValueAt(null, choosenIndex, 0);
+                    dtm.setValueAt(null, choosenIndex, 2);
+                    dtm.setValueAt(null, choosenIndex, 3);
+                    
+                    JOptionPane.showMessageDialog(null, "Deleted");
+                }
             }
-            
-            DateTimeFormatter dtDateTime=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            LocalDate choosenDate= LocalDate.parse((""+dtm.getValueAt(choosenIndex, 0)));
-            LocalTime choosenTime= LocalTime.parse((""+dtm.getValueAt(choosenIndex, 1)));
-            
-            LocalDateTime locDT=LocalDateTime.of(choosenDate, choosenTime);
-            String dateTime=locDT.format(dtDateTime);
-            hibUtil.removeByDate(dateTime);
-            
-            dtm.setValueAt(null, choosenIndex, 0);
-            dtm.setValueAt(null, choosenIndex, 2);
-            dtm.setValueAt(null, choosenIndex, 3);
-            
-            JOptionPane.showMessageDialog(null, "Deleted");
         };
         new Thread(runnable).start();
         
@@ -509,15 +522,18 @@ public class MainFrame extends JFrame {
         }
     }//GEN-LAST:event_jTableNextDayMousePressed
 
+    @SuppressWarnings("unchecked")
     private void setSeanseFromDatabaseToTable(LocalDate date, JTable table){
 
         String day=date.format(DateTimeFormatter.ISO_LOCAL_DATE);
                 
-        List lis=HibernateUtil.getListBy_Date(day);
+        List<?> lis;
+        lis = HibernateUtil.getListBy_Date(day);
             
+        try{
             if(!lis.isEmpty()){ 
                 DefaultTableModel dtm = (DefaultTableModel)table.getModel();
-//              Set data to JTable
+
                 lis.forEach((ob) -> {
                     Seanses s = (Seanses)ob;
                     String min=""+s.getSeansesTime().get(Calendar.MINUTE);
@@ -526,16 +542,21 @@ public class MainFrame extends JFrame {
                         }
                     String sqlTime=s.getSeansesTime().get(Calendar.HOUR_OF_DAY)+":"+min;
                     for(int i = 0;i<dtm.getRowCount();i++){
-                        String tableTime = (String)dtm.getValueAt(i, 1);
+                        String tableTime = (String)dtm.getValueAt(i, 0);
                         LocalDateTime ldt=LocalDateTime.ofInstant(s.getSeansesTime().toInstant(),ZoneId.systemDefault());
                             if(tableTime.equals(sqlTime)){
-                                dtm.setValueAt(getFormattedDate(ldt.toLocalDate()), i, 0);
-                                dtm.setValueAt(s.getPacientName(), i, 2);
-                                dtm.setValueAt(s.getPacientPhone(), i, 3);
+//                                dtm.setValueAt(getFormattedDate(ldt.toLocalDate()), i, 0);
+                                dtm.setValueAt(s.getPacientName(), i, 1);
+                                dtm.setValueAt(s.getPacientPhone(), i, 2);
+                                String isFirstTime = (s.getIsFirstTime())?"Вперше":null;
+                                dtm.setValueAt(isFirstTime, i, 3);
                             }
                     }
                 });
-            }            
+            }
+        }catch(NullPointerException e){
+                    
+        }
     }
     
     private void displayDataToTables(){
@@ -553,14 +574,14 @@ public class MainFrame extends JFrame {
                 for(;;){
                     getCurTime = LocalTime.now();
                     int minute =getCurTime.getMinute();
-                    int secons = getCurTime.getSecond();
+                    int seconds = getCurTime.getSecond();
                     String mins =""+minute;
-                    String sec = ""+secons;
+                    String sec = ""+seconds;
                         if(minute<10){
                             mins = "0"+minute;
                         }
-                        if(secons<10){
-                            sec = "0"+secons;
+                        if(seconds<10){
+                            sec = "0"+seconds;
                         }
                     labelClock.setText(getCurTime.getHour()+":"+mins+":"+sec);  
 
@@ -599,6 +620,11 @@ public class MainFrame extends JFrame {
                 next = getStartSeanseDay().plusDays(2);
             }
         return next;
+    }
+    private void getDatesForTable() {
+        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        today=getStartSeanseDay().format(dtf);
+        nextDay=getNextTableDate().format(dtf);
     }
     
     /**
@@ -645,8 +671,10 @@ public class MainFrame extends JFrame {
                 if(!list.isEmpty()){
                     firstTime=false;
                 }                
-                date_time= sdfDate.format(jDateChooser1.getDate())+" "+jComboTime.getSelectedItem();
-                sdfDateTime.parse(date_time);
+                
+                date_time= sdfDate.format(jDateChooser1.getDate());
+                updatedDate = date_time+" "+jComboTime.getSelectedItem();
+                sdfDateTime.parse(updatedDate);
                 
                 Calendar cal=sdfDateTime.getCalendar();
                 seanse= new Seanses(cal, tfPacFamily.getText(),firstTime);
@@ -706,6 +734,8 @@ public class MainFrame extends JFrame {
     private javax.swing.JTextField tfPacFamily;
     private javax.swing.JTextField tfPhone;
     // End of variables declaration//GEN-END:variables
+
+    
 
   
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.fordoctor.manage;
+package com.main_frame.api;
 
 import javax.swing.table.DefaultTableModel;
 
@@ -41,7 +41,6 @@ public class SeanseTableModel {
     }
     private Object[][] setShablon(String[] sched){
         
-//        String[] sched=getDefSchedule();
         tableShablon=new Object[sched.length][colNames.length];
         
         for(int col=0;col<colNames.length;col++){

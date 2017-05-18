@@ -5,6 +5,7 @@
  */
 package com.fordoctor.manage;
 
+import com.fordoctor.sqlimpl.HibernateUtil;
 import com.main_frame.api.MainFrame;
 import java.time.LocalDate;
 
@@ -14,17 +15,13 @@ import java.time.LocalDate;
  */
 public class Functions {
     
-    public String[] getArrayForComboDate(){
-        LocalDate firstDate =MainFrame.getStartSeanseDay();
-        LocalDate addedDay;
-        String[] dates = new String[12];
-            for(int i=0;i<10;i++){
-                addedDay=firstDate;
-                dates[i]=addedDay.toString();
-            }
-//            SeanseTableModel stm= new SeanseTableModel();
-        return dates;
+   private final HibernateUtil hibernateUtil;
+
+    public Functions() {
+        hibernateUtil=new HibernateUtil();
     }
+   
+   
     
     
 }
