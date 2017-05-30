@@ -5,6 +5,7 @@
  */
 package com.forDoctors.entity;
 
+import com.main_frame.api.apiCalendar;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +40,7 @@ public class Seanses implements Serializable {
     @Basic(optional = false)
     @Column(name = "seansesTime")
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar seansesTime;
+    private apiCalendar seansesTime;
     @Basic(optional = false)
     @Column(name = "pacientName")
     private String pacientName;
@@ -51,21 +52,21 @@ public class Seanses implements Serializable {
     public Seanses() {
     }
 
-    public Seanses(Calendar seansesTime) {
+    public Seanses(apiCalendar seansesTime) {
         this.seansesTime = seansesTime;
     }
 
-    public Seanses(Calendar seanses_time, String pacient_name,Boolean is_first_time) {
+    public Seanses(apiCalendar seanses_time, String pacient_name) {
         this.seansesTime = seanses_time;
         this.pacientName = pacient_name;
-        this.isFirstTime=is_first_time;
+        
     }
 
-    public Calendar getSeansesTime() {
+    public apiCalendar getSeansesTime() {
         return seansesTime;
     }
 
-    public void setSeansesTime(Calendar seansesTime) {
+    public void setSeansesTime(apiCalendar seansesTime) {
         this.seansesTime = seansesTime;
     }
 

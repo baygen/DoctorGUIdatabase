@@ -16,6 +16,7 @@ public class SeanseTableModel {
         private final String [] colNames;
         private String [] schedule;
         private Object[][] tableShablon;
+        private DefaultTableModel dtm;
         
     public SeanseTableModel() {
         this.colNames = new String[]{"", "Pacient Name", "Pacient phone","Перший раз"};
@@ -25,7 +26,7 @@ public class SeanseTableModel {
 
     public DefaultTableModel getModel(String date) {
         colNames[0]=date;
-        DefaultTableModel dtm=new DefaultTableModel(tableShablon, colNames);
+        dtm=new DefaultTableModel(tableShablon, colNames);
         return dtm;
     }
     public String [] getTableSchedule(){

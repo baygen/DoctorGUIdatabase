@@ -6,6 +6,8 @@
 package com.fordoctor.manage;
 
 import com.forDoctors.entity.Seanses;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  *
@@ -13,7 +15,13 @@ import com.forDoctors.entity.Seanses;
  */
 public interface MainFunctionsInterface {
     
-    public Seanses getSeanseFromGUI();    
+    public void saveSeanse(Seanses seanse);    
     
+    public List<?> getAllSeanses();
     
+    public List<?> getSeansesByDate(LocalDate locDate);
+    
+    public List<?> getSeansesByPacientName(String name);
+    
+    public boolean getFirstTimeOrNO(Seanses seanse);
 }

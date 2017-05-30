@@ -30,21 +30,21 @@ public class MainFrame extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private final HibernateUtil hibUtil;
-    private final SimpleDateFormat sdfDateTime= new SimpleDateFormat("yyyy-MM-dd HH:mm");
-    private final SimpleDateFormat sdfDate= new SimpleDateFormat("yyyy-MM-dd");
-    private String today;
-    private String nextDay;
-    public String date_time;
+    private final SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private final SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
+    private final String firstTableDay;
+    private final String nextTableDay;
+    public String date;
     private final SeanseTableModel seanseTableModel;
     private String updatedDate;
+    
     
 
     public MainFrame() {
         hibUtil = new HibernateUtil();
         seanseTableModel = new SeanseTableModel();
-        today=getFormattedDate(getStartSeanseDay());
-        nextDay=getFormattedDate(getNextTableDate());
-        getDatesForTable();
+        firstTableDay = apiCalendar.getFirstTableDayString();
+        nextTableDay = apiCalendar.getNextTableDayString();
         initComponents();
         runningClock();
         displayDataToTables();
@@ -447,17 +447,18 @@ public class MainFrame extends JFrame {
             
             @Override
             public void run(){
-                long start=LocalTime.now().toNanoOfDay();
+//                long start=LocalTime.now().toNanoOfDay();
                 Seanses seans = getSeanseFromGUI();
                 if(seans.getSeansesTime().before(Calendar.getInstance())){
                     JOptionPane.showMessageDialog(null, "Can't do this operation");
                 }else{
                     try{
                         hibUtil.addSeanse(seans,updatedDate);
+                        String seansesDate=seans.getSeansesTime().toDateString();
 //                        long end=LocalTime.now().toNanoOfDay();
-                        if(date_time.equals(today)){
+                        if(seansesDate.equals(firstTableDay)){
                                setSeanseFromDatabaseToTable(getStartSeanseDay(), jTableToday);
-                           }else if(date_time.equals(nextDay)){
+                           }else if(seansesDate.equals(nextTableDay)){
                                setSeanseFromDatabaseToTable(getNextTableDate(), jTableNextDay);
                            }
                         JOptionPane.showMessageDialog(null, "Seanse is created");
@@ -465,8 +466,8 @@ public class MainFrame extends JFrame {
                     }catch(HibernateException e){
                     }
                 }
-                long end=LocalTime.now().toNanoOfDay();
-                System.out.println((end-start)+"run() in thread at btnNewPacient(()");
+//                long end=LocalTime.now().toNanoOfDay();
+//                System.out.println((end-start)+"run() in thread at btnNewPacient(()");
             }
        };
        thread.start();
@@ -543,8 +544,8 @@ public class MainFrame extends JFrame {
                     String sqlTime=s.getSeansesTime().get(Calendar.HOUR_OF_DAY)+":"+min;
                     for(int i = 0;i<dtm.getRowCount();i++){
                         String tableTime = (String)dtm.getValueAt(i, 0);
-                        LocalDateTime ldt=LocalDateTime.ofInstant(s.getSeansesTime().toInstant(),ZoneId.systemDefault());
-                            if(tableTime.equals(sqlTime)){
+
+                        if(tableTime.equals(sqlTime)){
 //                                dtm.setValueAt(getFormattedDate(ldt.toLocalDate()), i, 0);
                                 dtm.setValueAt(s.getPacientName(), i, 1);
                                 dtm.setValueAt(s.getPacientPhone(), i, 2);
@@ -591,102 +592,66 @@ public class MainFrame extends JFrame {
         thr.start();
     }
 
-    public static LocalDate getStartSeanseDay() {
-        LocalDate day;
-        DayOfWeek todayOfWeek=LocalDate.now().getDayOfWeek();
-
-            if(todayOfWeek.equals(DayOfWeek.TUESDAY)||todayOfWeek.equals(DayOfWeek.THURSDAY)||todayOfWeek.equals(DayOfWeek.SATURDAY)){
-                day = LocalDate.now();
-            }else{
-                if(todayOfWeek.equals(DayOfWeek.SUNDAY)){
-                   day = LocalDate.now().plusDays(2);
-                }else{
-                day = LocalDate.now().plusDays(1);
-                }
-            }        
-        return day;
-    }
+    
     
     private String getFormattedDate(LocalDate date){
         DateTimeFormatter dtf=DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.format(dtf);
     }
-    
-    public static LocalDate getNextTableDate(){
-        LocalDate next;
-            if(DayOfWeek.SATURDAY.equals(LocalDate.now().getDayOfWeek())){
-                next = getStartSeanseDay().plusDays(3);
-            }else{
-                next = getStartSeanseDay().plusDays(2);
-            }
-        return next;
-    }
-    private void getDatesForTable() {
-        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        today=getStartSeanseDay().format(dtf);
-        nextDay=getNextTableDate().format(dtf);
-    }
-    
+           
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
         
-        //</editor-fold>
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//        
+//        //</editor-fold>
+//
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(() -> {
+//            new MainFrame().setVisible(true);
+//        });
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new MainFrame().setVisible(true);
-        });
+int y = 1;
+int k;
+for(k = 6; k >= 3; k--)
+y = y + k;
+System.out.println("y = " + y);
+System.out.println("k = " + k);
                     
     }
     
-    private Seanses getSeanseFromGUI() {
-        long start=LocalTime.now().toNanoOfDay();
+    public Seanses getSeanseFromGUI() {
         Seanses seanse=null;
         try{
             String pacName=tfPacFamily.getText();
             if(!pacName.trim().equals("")&&jDateChooser1.getDate()!=null){
                 
-                boolean firstTime=true;
-                
-                List<?> list = hibUtil.getSeanseByPacientName(pacName);
-                
-                if(!list.isEmpty()){
-                    firstTime=false;
-                }                
-                
-                date_time= sdfDate.format(jDateChooser1.getDate());
-                updatedDate = date_time+" "+jComboTime.getSelectedItem();
+                date= sdfDate.format(jDateChooser1.getDate());
+                updatedDate = date+" "+jComboTime.getSelectedItem();
                 sdfDateTime.parse(updatedDate);
                 
-                Calendar cal=sdfDateTime.getCalendar();
-                seanse= new Seanses(cal, tfPacFamily.getText(),firstTime);
+                apiCalendar cal=(apiCalendar) sdfDateTime.getCalendar();
+                seanse= new Seanses(cal, tfPacFamily.getText());
+                if(!tfPhone.getText().trim().equals(""))
                 seanse.setPacientPhone(tfPhone.getText());
             }else{
                 JOptionPane.showMessageDialog(null, "Field can't be empty");
             }
-        }catch(NullPointerException | HeadlessException | ParseException e){
-            
+        }catch(ParseException e){   
         }
-        long end=LocalTime.now().toNanoOfDay();
-        System.out.println((end-start)+"ns  method getSeanseFromGUI");
+
         return seanse;
         
     }
